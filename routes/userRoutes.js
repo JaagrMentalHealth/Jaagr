@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/signup', userController.signup);
 router.post('/login', userController.login);
 
-router.use(authMiddleware.protect);
+// router.use(authMiddleware.protect);
 
 router.get('/:id', userController.getUser);
 
