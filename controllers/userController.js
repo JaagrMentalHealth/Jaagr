@@ -9,7 +9,6 @@ const signToken = (id) => {
 };
 
 exports.signup = async (req, res) => {
-  // console.log("Hi")
   try {
     const newUser = await User.create({
       userName: req.body.userName,
@@ -21,7 +20,6 @@ exports.signup = async (req, res) => {
       fullName: req.body.fullName,
       bio: req.body.bio,
     });
-    console.log("Hi");
 
     const token = signToken(newUser.userName);
 
@@ -32,9 +30,12 @@ exports.signup = async (req, res) => {
         user: newUser,
       },
     });
+    console.log("Hello");
   } catch (err) {
+    console.log(err);
     if (err.code === 11000) {
       const field = Object.keys(err.keyPattern)[0];
+      console.log("Hi");
       res.status(400).json({
         status: "fail",
         message: `${
@@ -50,9 +51,38 @@ exports.signup = async (req, res) => {
   }
 };
 
+exports.getCurrentUser = async (req, res) => {
+  console.log("Hi");
+  try {
+    const user = await User.findOne({ userName: req.user.userName }).populate(
+      "blogs likedBlogs savedBlogs history"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        user,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(email, password);
 
     if (!email || !password) {
       return res
@@ -65,8 +95,8 @@ exports.login = async (req, res) => {
     if (!user || !(await user.correctPassword(password, user.password))) {
       return res.status(401).json({ message: "Incorrect email or password" });
     }
-
-    const token = signToken(user._id);
+    // console.log(user)
+    const token = signToken(user.userName);
     res.status(200).json({
       status: "success",
       token,
