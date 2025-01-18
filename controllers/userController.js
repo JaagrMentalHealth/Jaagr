@@ -133,47 +133,41 @@ exports.getUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    // Check if adminName is being updated
-    if (req.body.adminName) {
-      const existingUser = await User.findOne({
-        adminName: req.body.adminName,
-      });
-      if (existingUser && existingUser._id.toString() !== req.params.id) {
-        return res.status(400).json({
-          status: "fail",
-          message: "Admin name already exists. Please choose a different one.",
-        });
+    const { id } = req.params;
+    const updates = req.body;
+
+    // Function to check uniqueness
+    const checkUniqueness = async (field, value) => {
+      if (field === 'userName' || field === 'email') {
+        const existingUser = await User.findOne({ [field]: value });
+        if (existingUser && existingUser._id.toString() !== id) {
+          throw new Error(`${field === 'userName' ? 'Username' : 'Email'} already exists. Please choose a different one.`);
+        }
       }
+    };
+
+    // Check uniqueness for all fields being updated
+    for (const [field, value] of Object.entries(updates)) {
+      await checkUniqueness(field, value);
     }
 
-    // Check if email is being updated
-    if (req.body.email) {
-      const existingUser = await User.findOne({ email: req.body.email });
-      if (existingUser && existingUser._id.toString() !== req.params.id) {
-        return res.status(400).json({
-          status: "fail",
-          message: "Email already exists. Please choose a different one.",
-        });
-      }
-    }
-
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    // Update the user
+    const user = await User.findByIdAndUpdate(
+      id,
+      updates,
+      { new: true, runValidators: true }
+    );
 
     if (!user) {
-      return res.status(404).json({ message: "No user found with that ID" });
+      return res.status(404).json({ status: "fail", message: "No user found with that ID" });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       status: "success",
-      data: {
-        user,
-      },
+      data: { user }
     });
   } catch (err) {
-    res.status(400).json({
+    return res.status(400).json({
       status: "fail",
       message: err.message,
     });

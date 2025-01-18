@@ -18,7 +18,7 @@ exports.createBlog = async (req, res) => {
       coverPhoto,
       content,
       draft: draft !== undefined ? draft : true,
-      author: req.user.adminName,
+      author: req.user.userName,
     });
 
     await User.findByIdAndUpdate(req.user._id, { $push: { blogs: newBlog._id } });
@@ -86,7 +86,7 @@ exports.getBlog = async (req, res) => {
 exports.updateBlog = async (req, res) => {
   try {
     const blog = await Blog.findOneAndUpdate(
-      { slug: req.params.slug, author: req.user.adminName },
+      { slug: req.params.slug, author: req.user.userName },
       req.body,
       { new: true, runValidators: true }
     );
@@ -111,7 +111,7 @@ exports.updateBlog = async (req, res) => {
 
 exports.deleteBlog = async (req, res) => {
   try {
-    const blog = await Blog.findOneAndDelete({ slug: req.params.slug, author: req.user.adminName });
+    const blog = await Blog.findOneAndDelete({ slug: req.params.slug, author: req.user.userName });
 
     if (!blog) {
       return res.status(404).json({ message: 'No blog found with that slug or you are not the author' });
@@ -232,7 +232,7 @@ exports.getAuthorBlogs = async (req, res) => {
 
 exports.getCurrentUserBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find({ author: req.user.adminName }).sort('-createdAt');
+    const blogs = await Blog.find({ author: req.user.userName }).sort('-createdAt');
 
     res.status(200).json({
       status: 'success',
