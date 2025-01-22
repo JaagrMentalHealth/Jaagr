@@ -15,7 +15,7 @@ exports.createBlog = async (req, res) => {
 
     // Check if a blog with the same heading exists
     const existingBlog = await Blog.findOne({ heading });
-
+    console.log(existingBlog);
     if (existingBlog) {
       // If the author is the same, update the blog
       if (existingBlog.author.toString() === req.user._id.toString()) {
@@ -59,6 +59,7 @@ exports.createBlog = async (req, res) => {
       },
     });
   } catch (err) {
+    console.log(err);
     res.status(400).json({
       status: "fail",
       message: err.message,
@@ -68,7 +69,7 @@ exports.createBlog = async (req, res) => {
 
 exports.getAllBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find({ draft: false }).populate('author');
+    const blogs = await Blog.find({ draft: false }).populate("author");
     res.status(200).json({
       status: "success",
       results: blogs.length,
@@ -125,11 +126,9 @@ exports.updateBlog = async (req, res) => {
     );
 
     if (!blog) {
-      return res
-        .status(404)
-        .json({
-          message: "No blog found with that slug or you are not the author",
-        });
+      return res.status(404).json({
+        message: "No blog found with that slug or you are not the author",
+      });
     }
 
     res.status(200).json({
@@ -150,24 +149,23 @@ exports.deleteBlog = async (req, res) => {
   try {
     const blog = await Blog.findOneAndDelete({
       slug: req.params.slug,
-      author: req.user.userName,
+      author: req.user._id,
     });
 
     if (!blog) {
-      return res
-        .status(404)
-        .json({
-          message: "No blog found with that slug or you are not the author",
-        });
+      return res.status(404).json({
+        message: "No blog found with that slug or you are not the author",
+      });
     }
 
     await User.findByIdAndUpdate(req.user._id, { $pull: { blogs: blog._id } });
 
     res.status(204).json({
       status: "success",
-      data: null,
+      data: "Blog Deleted Successfully  ",
     });
   } catch (err) {
+    console.log(err);
     res.status(400).json({
       status: "fail",
       message: err.message,

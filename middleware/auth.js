@@ -16,23 +16,19 @@ exports.protect = async (req, res, next) => {
     // console.log(token);
 
     if (!token) {
-      return res
-        .status(401)
-        .json({
-          message: "You are not logged in! Please log in to get access.",
-        });
+      return res.status(401).json({
+        message: "You are not logged in! Please log in to get access.",
+      });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
-    const currentUser = await User.findOne({ userName: decoded.id});
+    // console.log(decoded);
+    const currentUser = await User.findOne({ userName: decoded.id });
 
     if (!currentUser) {
-      return res
-        .status(401)
-        .json({
-          message: "The user belonging to this token no longer exists.",
-        });
+      return res.status(401).json({
+        message: "The user belonging to this token no longer exists.",
+      });
     }
 
     req.user = currentUser;
@@ -50,8 +46,9 @@ exports.restrictToAuthor = async (req, res, next) => {
     if (!blog) {
       return res.status(404).json({ message: "No blog found with that slug" });
     }
+    const user = await User.findById(blog.author);
 
-    if (blog.author !== req.user.userName) {
+    if (user.userName !== req.user.userName) {
       return res
         .status(403)
         .json({ message: "You do not have permission to perform this action" });
