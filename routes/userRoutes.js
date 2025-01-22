@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/signup", userController.signup);
 router.post("/login", userController.login);
+router.get("/verifyUsername/:userName",userController.checkUsername)
 
 // router.use(authMiddleware.protect);
 

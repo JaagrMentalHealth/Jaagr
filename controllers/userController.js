@@ -79,6 +79,23 @@ exports.getCurrentUser = async (req, res) => {
   }
 };
 
+exports.checkUsername = async (req, res) => {
+  try {
+    const { userName } = req.params;
+    const exists = await User.exists({ userName });
+    
+    res.status(200).json({
+      status: "success",
+      exists: !!exists
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message
+    });
+  }
+};
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
