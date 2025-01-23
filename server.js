@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
+const bodyParser = require("body-parser")
 
 const userRoutes = require('./routes/userRoutes');
 const blogRoutes = require('./routes/blogRoutes');
@@ -16,6 +17,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
+
+app.use((req, res, next) => {
+  bodyParser.json()(req, res, (err) => {
+    if (err) {
+      console.error(err)
+      return res.status(400).json({ status: "error", message: "Invalid JSON payload" })
+    }
+    next()
+  })
+})
 
 // Routes
 app.use('/api/users', userRoutes);

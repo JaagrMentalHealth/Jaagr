@@ -1,12 +1,15 @@
-const User = require("../models/User");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const User = require("../models/User")
+const jwt = require("jsonwebtoken")
+const bcrypt = require("bcryptjs")
+const { OAuth2Client } = require("google-auth-library")
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-};
+  })
+}
 
 exports.signup = async (req, res) => {
   try {
@@ -14,14 +17,11 @@ exports.signup = async (req, res) => {
       userName: req.body.userName,
       email: req.body.email,
       password: req.body.password,
-      dateOfBirth: req.body.dateOfBirth,
-      country: req.body.country,
-      gender: req.body.gender,
       fullName: req.body.fullName,
       bio: req.body.bio,
-    });
+    })
 
-    const token = signToken(newUser.userName);
+    const token = signToken(newUser.userName)
 
     res.status(201).json({
       status: "success",
@@ -29,27 +29,81 @@ exports.signup = async (req, res) => {
       data: {
         user: newUser,
       },
-    });
-    console.log("Hello");
+    })
   } catch (err) {
-    console.log(err);
     if (err.code === 11000) {
-      const field = Object.keys(err.keyPattern)[0];
-      console.log("Hi");
+      const field = Object.keys(err.keyPattern)[0]
       res.status(400).json({
         status: "fail",
-        message: `${
-          field.charAt(0).toUpperCase() + field.slice(1)
-        } already exists. Please choose a different one.`,
-      });
+        message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists. Please choose a different one.`,
+      })
     } else {
       res.status(400).json({
         status: "fail",
         message: err.message,
-      });
+      })
     }
   }
-};
+}
+
+exports.googleLogin = async (req, res) => {
+  try {
+    const { credential } = req.body
+
+    if (!credential) {
+      return res.status(400).json({ status: "error", message: "Credential is required" })
+    }
+
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    })
+
+    const payload = ticket.getPayload()
+    if (!payload) {
+      throw new Error("Invalid Google token")
+    }
+
+    const { email, name, picture, sub: googleId } = payload
+
+    let user = await User.findOne({ $or: [{ googleId }, { email }] })
+
+    if (!user) {
+      // Create a new user if not found
+      user = await User.create({
+        email,
+        fullName: name,
+        profilePhoto: picture,
+        googleId,
+        userName: email.split("@")[0], // Use email prefix as username
+      })
+    } else if (!user.googleId) {
+      // If user exists but doesn't have googleId, update it
+      user.googleId = googleId
+      await user.save()
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    })
+
+    res.status(200).json({
+      status: "success",
+      token,
+      data: {
+        user,
+      },
+    })
+  } catch (error) {
+    console.error("Google login error:", error)
+    res.status(400).json({
+      status: "error",
+      message: error.message || "An error occurred during Google login",
+    })
+  }
+}
+
+
 
 exports.getCurrentUser = async (req, res) => {
   console.log("Hi");

@@ -6,19 +6,18 @@ const router = express.Router();
 
 router.post("/signup", userController.signup);
 router.post("/login", userController.login);
-router.get("/verifyUsername/:userName",userController.checkUsername)
-
-// router.use(authMiddleware.protect);
-
-// router.get("/:id", userController.getUser);
-
-router.patch("/:id", userController.updateUser);
-router.delete("/:id", userController.deleteUser);
-
-router.get(
-  "/getUser",
-  authMiddleware.protect,
-  userController.getCurrentUser
+router.post(
+  "/google-login",
+  () => {
+    console.log("Hello, I am in Middleware");
+  },
+  userController.googleLogin
 );
+router.get("/verifyUsername/:userName", userController.checkUsername);
+
+router.patch("/:id", authMiddleware.protect, userController.updateUser);
+router.delete("/:id", authMiddleware.protect, userController.deleteUser);
+
+router.get("/getUser", authMiddleware.protect, userController.getCurrentUser);
 
 module.exports = router;
