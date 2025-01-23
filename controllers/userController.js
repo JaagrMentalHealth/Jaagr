@@ -1,15 +1,15 @@
-const User = require("../models/User")
-const jwt = require("jsonwebtoken")
-const bcrypt = require("bcryptjs")
-const { OAuth2Client } = require("google-auth-library")
+const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const { OAuth2Client } = require("google-auth-library");
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
-  })
-}
+  });
+};
 
 exports.signup = async (req, res) => {
   try {
@@ -19,9 +19,9 @@ exports.signup = async (req, res) => {
       password: req.body.password,
       fullName: req.body.fullName,
       bio: req.body.bio,
-    })
+    });
 
-    const token = signToken(newUser.userName)
+    const token = signToken(newUser.userName);
 
     res.status(201).json({
       status: "success",
@@ -29,44 +29,50 @@ exports.signup = async (req, res) => {
       data: {
         user: newUser,
       },
-    })
+    });
   } catch (err) {
     if (err.code === 11000) {
-      const field = Object.keys(err.keyPattern)[0]
+      const field = Object.keys(err.keyPattern)[0];
       res.status(400).json({
         status: "fail",
-        message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists. Please choose a different one.`,
-      })
+        message: `${
+          field.charAt(0).toUpperCase() + field.slice(1)
+        } already exists. Please choose a different one.`,
+      });
     } else {
       res.status(400).json({
         status: "fail",
         message: err.message,
-      })
+      });
     }
   }
-}
+};
 
 exports.googleLogin = async (req, res) => {
+  // console.log("Into controller");
   try {
-    const { credential } = req.body
-
+    const { credential } = req.body;
+    console.log(credential);
     if (!credential) {
-      return res.status(400).json({ status: "error", message: "Credential is required" })
+      return res
+        .status(400)
+        .json({ status: "error", message: "Credential is required" });
     }
 
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
-    })
+    });
 
-    const payload = ticket.getPayload()
+    const payload = ticket.getPayload();
     if (!payload) {
-      throw new Error("Invalid Google token")
+      throw new Error("Invalid Google token");
     }
+    // console.log("recieved payload");
 
-    const { email, name, picture, sub: googleId } = payload
+    const { email, name, picture, sub: googleId } = payload;
 
-    let user = await User.findOne({ $or: [{ googleId }, { email }] })
+    let user = await User.findOne({ $or: [{ googleId }, { email }] });
 
     if (!user) {
       // Create a new user if not found
@@ -76,16 +82,16 @@ exports.googleLogin = async (req, res) => {
         profilePhoto: picture,
         googleId,
         userName: email.split("@")[0], // Use email prefix as username
-      })
+      });
     } else if (!user.googleId) {
       // If user exists but doesn't have googleId, update it
-      user.googleId = googleId
-      await user.save()
+      user.googleId = googleId;
+      await user.save();
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user.userName }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN,
-    })
+    });
 
     res.status(200).json({
       status: "success",
@@ -93,17 +99,15 @@ exports.googleLogin = async (req, res) => {
       data: {
         user,
       },
-    })
+    });
   } catch (error) {
-    console.error("Google login error:", error)
+    console.error("Google login error:", error);
     res.status(400).json({
       status: "error",
       message: error.message || "An error occurred during Google login",
-    })
+    });
   }
-}
-
-
+};
 
 exports.getCurrentUser = async (req, res) => {
   console.log("Hi");
@@ -137,15 +141,15 @@ exports.checkUsername = async (req, res) => {
   try {
     const { userName } = req.params;
     const exists = await User.exists({ userName });
-    
+
     res.status(200).json({
       status: "success",
-      exists: !!exists
+      exists: !!exists,
     });
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: err.message
+      message: err.message,
     });
   }
 };
@@ -209,10 +213,14 @@ exports.updateUser = async (req, res) => {
 
     // Function to check uniqueness
     const checkUniqueness = async (field, value) => {
-      if (field === 'userName' || field === 'email') {
+      if (field === "userName" || field === "email") {
         const existingUser = await User.findOne({ [field]: value });
         if (existingUser && existingUser._id.toString() !== id) {
-          throw new Error(`${field === 'userName' ? 'Username' : 'Email'} already exists. Please choose a different one.`);
+          throw new Error(
+            `${
+              field === "userName" ? "Username" : "Email"
+            } already exists. Please choose a different one.`
+          );
         }
       }
     };
@@ -223,19 +231,20 @@ exports.updateUser = async (req, res) => {
     }
 
     // Update the user
-    const user = await User.findByIdAndUpdate(
-      id,
-      updates,
-      { new: true, runValidators: true }
-    );
+    const user = await User.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!user) {
-      return res.status(404).json({ status: "fail", message: "No user found with that ID" });
+      return res
+        .status(404)
+        .json({ status: "fail", message: "No user found with that ID" });
     }
 
     return res.status(200).json({
       status: "success",
-      data: { user }
+      data: { user },
     });
   } catch (err) {
     return res.status(400).json({

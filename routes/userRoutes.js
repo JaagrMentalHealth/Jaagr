@@ -8,8 +8,9 @@ router.post("/signup", userController.signup);
 router.post("/login", userController.login);
 router.post(
   "/google-login",
-  () => {
-    console.log("Hello, I am in Middleware");
+  (req,res,next) => {
+    console.log(req.body.credential);
+    next();
   },
   userController.googleLogin
 );
