@@ -109,12 +109,36 @@ exports.googleLogin = async (req, res) => {
   }
 };
 
+exports.getFullName=async(req,res)=>{
+  try{
+    const user=await User.findById(req.params.id);
+    if(!user){
+      return res.status(404).json({
+        status: 'fail',
+        message: "User Not Found"
+      })
+    }
+    res.status(200).json({
+      status:"success",
+      fullName: user.fullName
+    })
+  }
+  catch(err){
+    res.status(400).json({
+      status:'fail',
+      message: err
+    })
+  }
+}
+
 exports.getCurrentUser = async (req, res) => {
   console.log("Hi");
   try {
     const user = await User.findOne({ userName: req.user.userName }).populate(
       "blogs likedBlogs savedBlogs history"
-    );
+    ).populate("history.author")
+    
+    
 
     if (!user) {
       return res.status(404).json({
@@ -238,7 +262,7 @@ exports.updateUser = async (req, res) => {
 
     if (!user) {
       return res
-        .status(404)
+        .status()
         .json({ status: "fail", message: "No user found with that ID" });
     }
 

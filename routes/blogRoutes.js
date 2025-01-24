@@ -1,12 +1,12 @@
 const express = require('express');
 const blogController = require('../controllers/blogController');
 const authMiddleware = require('../middleware/auth');
-
+const blogMiddlware=require('../middleware/blogMiddleware')
 const router = express.Router();
 
 // Public routes
 router.get('/', blogController.getAllBlogs);
-router.get('/:slug', blogController.getBlog);
+router.get('/:slug',blogMiddlware.trackHistory, blogController.getBlog);
 
 // Protected routes
 router.use(authMiddleware.protect);

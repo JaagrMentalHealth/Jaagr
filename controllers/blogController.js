@@ -87,9 +87,7 @@ exports.getAllBlogs = async (req, res) => {
 
 exports.getBlog = async (req, res) => {
   try {
-    const blog = await Blog.findOne({ slug: req.params.slug }).populate(
-      "author"
-    );
+    const blog = req.blog;
     if (!blog) {
       return res.status(404).json({ message: "No blog found with that slug" });
     }
