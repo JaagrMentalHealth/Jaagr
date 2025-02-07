@@ -4,10 +4,12 @@ const cors = require("cors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
+const { sendOTP, verifyOTP } = require("./controllers/otpContoller");
 
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const errorHandler = require("./middleware/errorHandler");
+
 
 dotenv.config();
 
@@ -43,10 +45,15 @@ app.use((req, res, next) => {
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
 
+// API Routes for otp
+app.post("/send-otp", sendOTP);
+app.post("/verify-otp", verifyOTP);
+
 // Error handling middleware
 app.use(errorHandler);
 
 // Connect to MongoDB
+console.log(process.env.MONGODB_URI);
 mongoose.set("strictQuery", true);
 mongoose
   .connect(process.env.MONGODB_URI, {

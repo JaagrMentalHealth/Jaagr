@@ -1,5 +1,5 @@
-const mongoose = require("mongoose")
-const bcrypt = require("bcryptjs")
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: function () {
-        return !this.googleId
+        return !this.googleId;
       },
       minlength: 8,
       select: false,
@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
     profilePhoto: {
       type: String,
       default: function () {
-        return this.gender === "female" ? "default-female.png" : "default-male.png"
+        return this.gender === "female" ? "default-female.png" : "default-male.png";
       },
     },
     bio: String,
@@ -47,20 +47,21 @@ const userSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    otp: { type: String },
+    otpExpiresAt: { type: Date }
   },
-  { timestamps: true },
-)
+  { timestamps: true }
+);
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next()
-  this.password = await bcrypt.hash(this.password, 12)
-  next()
-})
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
 
 userSchema.methods.correctPassword = async (candidatePassword, userPassword) =>
-  await bcrypt.compare(candidatePassword, userPassword)
+  await bcrypt.compare(candidatePassword, userPassword);
 
-const User = mongoose.model("User", userSchema)
+const User = mongoose.model("User", userSchema);
 
-module.exports = User
-
+module.exports = User;
