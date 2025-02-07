@@ -15,7 +15,7 @@ router.post('/', blogController.createBlog);
 router.patch('/:slug', authMiddleware.restrictToAuthor, blogController.updateBlog);
 router.delete('/:slug', authMiddleware.restrictToAuthor, blogController.deleteBlog);
 router.post('/:slug/like', blogController.likeBlog);
-// router.post('/:slug/save', blogController.saveBlog);
+router.post('/:slug/save', blogController.saveBlog);
 // router.get('/user/saved', blogController.getSavedBlogs);
 router.get('/author/:authorName', blogController.getAuthorBlogs);
 // router.get('/user/my-blogs', blogController.getCurrentUserBlogs);

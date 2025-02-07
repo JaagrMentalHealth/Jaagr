@@ -7,6 +7,7 @@ exports.protect = async (req, res, next) => {
   // console.log("Middleware");
   try {
     let token;
+    console.log(req.headers);
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")

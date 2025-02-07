@@ -174,21 +174,41 @@ exports.deleteBlog = async (req, res) => {
 exports.likeBlog = async (req, res) => {
   try {
     const blog = await Blog.findOne({ slug: req.params.slug });
+
     if (!blog) {
       return res.status(404).json({ message: "No blog found with that slug" });
     }
 
-    blog.likes += 1;
-    await blog.save();
+    const user = await User.findById(req.user._id);
 
-    await User.findByIdAndUpdate(req.user._id, {
-      $addToSet: { likedBlogs: blog._id },
-    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the blog is already liked by the user
+    const isLiked = user.likedBlogs.includes(blog._id);
+
+    if (isLiked) {
+      // Unlike the blog by pulling it from the likedBlogs array
+      await User.findByIdAndUpdate(req.user._id, {
+        $pull: { likedBlogs: blog._id },
+      });
+      blog.likes -= 1;
+    } else {
+      // Like the blog by adding it to the likedBlogs array
+      await User.findByIdAndUpdate(req.user._id, {
+        $addToSet: { likedBlogs: blog._id },
+      });
+      blog.likes += 1;
+    }
+
+    await blog.save();
 
     res.status(200).json({
       status: "success",
       data: {
         blog,
+        liked: !isLiked, // Returns true if the blog is liked, false if unliked
       },
     });
   } catch (err) {
@@ -199,59 +219,55 @@ exports.likeBlog = async (req, res) => {
   }
 };
 
-// exports.saveBlog = async (req, res) => {
-//   try {
-//     const blog = await Blog.findOne({ slug: req.params.slug });
-//     if (!blog) {
-//       return res.status(404).json({ message: 'No blog found with that slug' });
-//     }
 
-//     const user = await User.findById(req.user._id);
-//     if (!user) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
+exports.saveBlog = async (req, res) => {
+  try {
+    const blog = await Blog.findOne({ slug: req.params.slug });
 
-//     if (user.savedBlogs.includes(blog._id)) {
-//       return res.status(400).json({ message: 'Blog already saved' });
-//     }
+    if (!blog) {
+      return res.status(404).json({ message: "No blog found with that slug" });
+    }
 
-//     user.savedBlogs.push(blog._id);
-//     await user.save();
+    const user = await User.findById(req.user._id);
 
-//     res.status(200).json({
-//       status: 'success',
-//       message: 'Blog saved successfully'
-//     });
-//   } catch (err) {
-//     res.status(400).json({
-//       status: 'fail',
-//       message: err.message
-//     });
-//   }
-// };
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-// exports.getSavedBlogs = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user._id).populate('savedBlogs');
+    // Check if the blog is already saved by the user
+    const isSaved = user.savedBlogs.includes(blog._id);
 
-//     if (!user) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
+    if (isSaved) {
+      // Unsave the blog by pulling it from the savedBlogs array
+      await User.findByIdAndUpdate(req.user._id, {
+        $pull: { savedBlogs: blog._id },
+      });
 
-//     res.status(200).json({
-//       status: 'success',
-//       results: user.savedBlogs.length,
-//       data: {
-//         savedBlogs: user.savedBlogs
-//       }
-//     });
-//   } catch (err) {
-//     res.status(400).json({
-//       status: 'fail',
-//       message: err.message
-//     });
-//   }
-// };
+      res.status(200).json({
+        status: "success",
+        message: "Blog unsaved successfully",
+        saved: false, // Indicates blog is unsaved
+      });
+    } else {
+      // Save the blog by adding it to the savedBlogs array
+      await User.findByIdAndUpdate(req.user._id, {
+        $addToSet: { savedBlogs: blog._id }, // Prevents duplicate entries
+      });
+
+      res.status(200).json({
+        status: "success",
+        message: "Blog saved successfully",
+        saved: true, // Indicates blog is saved
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 
 exports.getAuthorBlogs = async (req, res) => {
   try {
