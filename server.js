@@ -9,7 +9,13 @@ const { sendOTP, verifyOTP } = require("./controllers/otpContoller");
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const errorHandler = require("./middleware/errorHandler");
-
+app.use(morgan("dev"));
+app.use((req, res, next) => {
+  console.log(`Request Method: ${req.method}`);
+  console.log(`Request URL: ${req.url}`);
+  console.log(`Request Body: ${JSON.stringify(req.body)}`);
+  next();
+});
 
 dotenv.config();
 
@@ -64,7 +70,7 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT ||3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
