@@ -1,65 +1,89 @@
-const { generateOTP } = require("../utils/otp");
-const { Mailer } = require("../utils/mailer");
-const User = require("../models/User"); // Assuming User model is defined
+const { totp } = require('otplib');
+const User = require('../models/user');
+const Mailer = require('../utils/mailer');
 
+// Configure OTP generation
+totp.options = {
+  step: 300, // OTP valid for 5 minutes
+  digits: 6,
+};
 
+// Helper Function for Sending Error Response
+const handleError = (res, message, statusCode = 400) => {
+  res.status(statusCode).json({ status: 'error', message });
+};
 
-// Generate and Send OTP
-const sendOTP = async (req, res) => {
+// Send OTP Function
+const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
+
+    if (!email) {
+      return handleError(res, 'Email is required');
+    }
+
+    // Check if user exists
     let user = await User.findOne({ email });
-
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return handleError(res, 'User not found', 404);
     }
 
-    const otp = generateOTP();
+    // Generate OTP using email as the secret
+    const otp = totp.generate(email);
+    console.log(`Generated OTP: ${otp} for email: ${email}`);
+
+    // Save OTP and expiry to the user document
     user.otp = otp;
-    user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+    user.otpExpiresAt = Date.now() + 5 * 60 * 1000; // 5-minute expiry
     await user.save();
 
-    const text = `Your OTP is ${otp}. It is valid for 10 minutes.`;
-    const mailSent = await Mailer(email, text, "Your OTP Code");
-
-    if (mailSent) {
-      res.status(200).json({ message: "OTP sent successfully" });
-    } else {
-      res.status(500).json({ message: "Failed to send OTP" });
-    }
+    // Send the OTP via email
+    await Mailer(email, `Your OTP is ${otp}`, 'OTP Verification');
+    return res.status(200).json({ status: 'success', message: 'OTP sent successfully' });
   } catch (error) {
-    console.error("Error in sending OTP:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error('Error sending OTP:', error);
+    handleError(res, 'Error sending OTP', 500);
   }
 };
 
-// Verify OTP
-const verifyOTP = async (req, res) => {
+// Verify OTP Function
+const verifyOtp = async (req, res) => {
   try {
-    const { email, token } = req.body;
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return handleError(res, 'Email and OTP are required');
+    }
+
     const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!user || !user.otp) {
+      return handleError(res, 'Invalid OTP or user not found');
     }
 
-    if (!user.otp || Date.now() > user.otpExpiresAt) {
-      return res.status(400).json({ message: "OTP expired or invalid" });
+    // Check if the OTP has expired
+    if (Date.now() > user.otpExpiresAt) {
+      return handleError(res, 'OTP expired');
     }
 
-    if (user.otp !== token) {
-      return res.status(400).json({ message: "Invalid OTP" });
+    // Verify the OTP using the same secret (email)
+    if (totp.check(otp, email)) {
+      // Clear OTP after successful verification
+      user.otp = null;
+      user.otpExpiresAt = null;
+      await user.save();
+
+      return res.status(200).json({ status: 'success', message: 'OTP verified successfully' });
+    } else {
+      return handleError(res, 'Invalid OTP');
     }
-
-    user.otp = null; // Clear OTP after successful verification
-    user.otpExpiresAt = null;
-    await user.save();
-
-    res.status(200).json({ message: "OTP verified successfully" });
   } catch (error) {
-    console.error("Error verifying OTP:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error('Error verifying OTP:', error);
+    handleError(res, 'Error verifying OTP', 500);
   }
 };
 
-module.exports = { sendOTP, verifyOTP };
+// Exporting controller functions
+module.exports = {
+  sendOtp,
+  verifyOtp,
+};

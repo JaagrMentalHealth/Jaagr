@@ -4,18 +4,11 @@ const cors = require("cors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
-const { sendOTP, verifyOTP } = require("./controllers/otpContoller");
+const { sendOtp, verifyOtp } = require("./controllers/otpContoller"); // Corrected import
 
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const errorHandler = require("./middleware/errorHandler");
-app.use(morgan("dev"));
-app.use((req, res, next) => {
-  console.log(`Request Method: ${req.method}`);
-  console.log(`Request URL: ${req.url}`);
-  console.log(`Request Body: ${JSON.stringify(req.body)}`);
-  next();
-});
 
 dotenv.config();
 
@@ -26,23 +19,13 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.use((req, res, next) => {
-  bodyParser.json()(req, res, (err) => {
-    if (err) {
-      console.error(err);
-      return res
-        .status(400)
-        .json({ status: "error", message: "Invalid JSON payload" });
-    }
-    next();
-  });
-});
+app.use(bodyParser.json());
 
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-  res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins for testing
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST");
   next();
 });
@@ -51,15 +34,14 @@ app.use((req, res, next) => {
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
 
-// API Routes for otp
-app.post("/send-otp", sendOTP);
-app.post("/verify-otp", verifyOTP);
+// API Routes for OTP
+app.post("/send-otp", sendOtp); // Corrected function names
+app.post("/verify-otp", verifyOtp);
 
 // Error handling middleware
 app.use(errorHandler);
 
 // Connect to MongoDB
-console.log(process.env.MONGODB_URI);
 mongoose.set("strictQuery", true);
 mongoose
   .connect(process.env.MONGODB_URI, {
@@ -70,7 +52,7 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Start the server
-const PORT = process.env.PORT ||3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

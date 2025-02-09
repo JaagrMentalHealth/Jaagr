@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema(
       sparse: true,
     },
     otp: { type: String },
-    otpExpiresAt: { type: Date }
+    otpExpiresAt: { type: Date },
   },
   { timestamps: true }
 );
@@ -62,6 +62,7 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.correctPassword = async (candidatePassword, userPassword) =>
   await bcrypt.compare(candidatePassword, userPassword);
 
-const User = mongoose.model("User", userSchema);
+// Prevent OverwriteModelError by checking if the model exists
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 module.exports = User;
