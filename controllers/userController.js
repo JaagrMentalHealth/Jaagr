@@ -48,6 +48,27 @@ exports.signup = async (req, res) => {
   }
 };
 
+// 3️⃣ Change Password After OTP Verification
+exports.changePassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ status: "fail", message: "User not found" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 12);
+    await user.save();
+
+    res.status(200).json({ status: "success", message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ status: "fail", message: "Internal Server Error" });
+  }
+};
+
+
 exports.googleLogin = async (req, res) => {
   // console.log("Into controller");
   try {

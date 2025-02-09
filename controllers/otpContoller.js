@@ -2,22 +2,22 @@ const { generateOTP } = require("../utils/otp");
 const { Mailer } = require("../utils/mailer");
 const User = require("../models/User"); // Assuming User model is defined
 
-
-
 // Generate and Send OTP
 const sendOTP = async (req, res) => {
   try {
-    const { email } = req.body;
-    let user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const { email, mode } = req.body;
+    // let user = await User.findOne({ email });
+    console.log(email);
+    if (mode == "change password" || mode == "forget password") {
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
     }
 
     const otp = generateOTP();
-    user.otp = otp;
-    user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
-    await user.save();
+    // user.otp = otp;
+    // user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+    // await user.save();
 
     const text = `Your OTP is ${otp}. It is valid for 10 minutes.`;
     const mailSent = await Mailer(email, text, "Your OTP Code");

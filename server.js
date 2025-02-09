@@ -4,7 +4,9 @@ const cors = require("cors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
-const { sendOTP, verifyOTP } = require("./controllers/otpContoller");
+// const { sendOTP, verifyOTP } = require("./controllers/otpContoller");
+
+const otpRoutes=require("./routes/otpRoutes")
 
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
@@ -46,8 +48,11 @@ app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
 
 // API Routes for otp
-app.post("/send-otp", sendOTP);
-app.post("/verify-otp", verifyOTP);
+// app.post("/send-otp", sendOTP);
+// app.post("/verify-otp", verifyOTP);
+
+
+app.use("/api/otp",otpRoutes)
 
 // Error handling middleware
 app.use(errorHandler);
