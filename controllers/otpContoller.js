@@ -1,6 +1,6 @@
 const { totp } = require('otplib');
 const User = require('../models/user');
-const Mailer = require('../utils/mailer');
+const {Mailer} = require('../utils/mailer');
 
 // Configure OTP generation
 totp.options = {
@@ -16,26 +16,33 @@ const handleError = (res, message, statusCode = 400) => {
 // Send OTP Function
 const sendOtp = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, mode } = req.body;
+    
+    if (mode == "change password" || mode == "forget password") {
+        const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+    }
+
+
 
     if (!email) {
       return handleError(res, 'Email is required');
     }
 
     // Check if user exists
-    let user = await User.findOne({ email });
-    if (!user) {
-      return handleError(res, 'User not found', 404);
-    }
+    
+
+   
 
     // Generate OTP using email as the secret
     const otp = totp.generate(email);
     console.log(`Generated OTP: ${otp} for email: ${email}`);
 
     // Save OTP and expiry to the user document
-    user.otp = otp;
-    user.otpExpiresAt = Date.now() + 5 * 60 * 1000; // 5-minute expiry
-    await user.save();
+   
+
 
     // Send the OTP via email
     await Mailer(email, `Your OTP is ${otp}`, 'OTP Verification');
