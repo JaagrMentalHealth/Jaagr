@@ -23,4 +23,8 @@ router.delete("/:id", authMiddleware.protect, userController.deleteUser);
 
 router.get("/getUser", authMiddleware.protect, userController.getCurrentUser);
 
+router.get("/change-password",authMiddleware.protect,userController.changePasswordRequest)
+
+router.post("/change-password",userController.changePassword)
+
 module.exports = router;

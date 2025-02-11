@@ -1,7 +1,8 @@
-const User = require("../models/User");
+const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { OAuth2Client } = require("google-auth-library");
+const { Mailer } = require("../utils/mailer");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -109,36 +110,33 @@ exports.googleLogin = async (req, res) => {
   }
 };
 
-exports.getFullName=async(req,res)=>{
-  try{
-    const user=await User.findById(req.params.id);
-    if(!user){
+exports.getFullName = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
       return res.status(404).json({
-        status: 'fail',
-        message: "User Not Found"
-      })
+        status: "fail",
+        message: "User Not Found",
+      });
     }
     res.status(200).json({
-      status:"success",
-      fullName: user.fullName
-    })
-  }
-  catch(err){
+      status: "success",
+      fullName: user.fullName,
+    });
+  } catch (err) {
     res.status(400).json({
-      status:'fail',
-      message: err
-    })
+      status: "fail",
+      message: err,
+    });
   }
-}
+};
 
 exports.getCurrentUser = async (req, res) => {
   console.log("Hi");
   try {
-    const user = await User.findOne({ userName: req.user.userName }).populate(
-      "blogs likedBlogs savedBlogs history"
-    ).populate("history.author")
-    
-    
+    const user = await User.findOne({ userName: req.user.userName })
+      .populate("blogs likedBlogs savedBlogs history")
+      .populate("history.author");
 
     if (!user) {
       return res.status(404).json({
@@ -295,5 +293,72 @@ exports.deleteUser = async (req, res) => {
       status: "fail",
       message: err.message,
     });
+  }
+};
+
+exports.changePasswordRequest = async (req, res) => {
+  try {
+    const user = req.user;
+    const url = req.get("Referer") || req.get("Origin");
+
+    // Hash the user's _id
+    const hashedId = await bcrypt.hash(user._id.toString(), 10);
+    const baseUrl = url;
+    // Append the hashed ID to the URL as a parameter
+    const changePasswordUrl = `${baseUrl}/change-password?id=${encodeURIComponent(
+      hashedId
+    )}`;
+    const emailMessage = `Password Changing Link ${changePasswordUrl}`;
+    await Mailer(user.email, emailMessage, "Password Change URL");
+
+    console.log(changePasswordUrl.toString(), user.email);
+    res.status(200).json({ message: "Email Sent" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+exports.changePassword = async (req, res) => {
+  try {
+    const { hashedUserId, newPassword } = req.body;
+    // console.log(req.body);
+    if (!hashedUserId || !newPassword) {
+      return;
+      res
+        .status(404)
+        .json({ message: "Please Enter the password and the hashed ID" });
+    }
+    // Retrieve all users to compare the hashedUserId
+    const users = await User.find();
+    let user = null;
+
+    // Find the user by comparing the hashed ID
+    for (const u of users) {
+      const isMatch = await bcrypt.compare(u._id.toString(), hashedUserId);
+      // console.log(isMatch);
+      if (isMatch) {
+        user = u;
+        break;
+      }
+    }
+
+    // If no user matches, return error
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Hash the new password
+    // const saltRounds = 10;
+    console.log(user);
+
+    // Update password in database
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

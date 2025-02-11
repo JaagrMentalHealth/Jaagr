@@ -4,7 +4,8 @@ const cors = require("cors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
-const { sendOtp, verifyOtp } = require("./controllers/otpContoller"); // Corrected import
+const otpRoutes = require("./routes/otpRoutes");
+const { sendOtp, verifyOtp } = require("./controllers/otpController"); // Corrected import
 
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
@@ -33,10 +34,7 @@ app.use((req, res, next) => {
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
-
-// API Routes for OTP
-app.post("/send-otp", sendOtp); // Corrected function names
-app.post("/verify-otp", verifyOtp);
+app.use("/api/otp", otpRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
