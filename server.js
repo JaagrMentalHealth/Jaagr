@@ -10,6 +10,7 @@ const { sendOtp, verifyOtp } = require("./controllers/otpController"); // Correc
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const errorHandler = require("./middleware/errorHandler");
+const adminApp = require("./admin_application/adminServer");
 
 dotenv.config();
 
@@ -35,6 +36,8 @@ app.use((req, res, next) => {
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/otp", otpRoutes);
+
+app.use("/admin",adminApp)
 
 // Error handling middleware
 app.use(errorHandler);

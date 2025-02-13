@@ -1,5 +1,5 @@
 const { totp } = require("otplib");
-const User = require("../models/user");
+const User = require("../models/User");
 const { Mailer } = require("../utils/mailer");
 
 // Configure OTP generation
