@@ -136,6 +136,8 @@ exports.createGhostProfile = async (req, res) => {
           expiresIn: "28d",
         }
       );
+      const message = `Hello ${fullName} Kindly Visit the following Link to start your assessment http://localhost:3000/self-assessment/organisation?a=${authToken}`;
+      const mailSent = await Mailer(email, message, "Dummy Assessment Link");
 
       return res.status(201).json({
         message: "Ghost profile created successfully",
@@ -151,11 +153,13 @@ exports.createGhostProfile = async (req, res) => {
       expiresIn: "28d",
     });
     console.log(authToken);
-
+    const message = `Hello ${fullName} Kindly Visit the following Link to start your assessment http://localhost:3000/self-assessment/organisation?a=${authToken}`;
+    const mailSent = await Mailer(email, message, "Dummy Assessment Link");
     return res.status(200).json({
       message: "User already exists",
       userId: user._id,
-      authToken, // Return the signed JWT token
+      authToken,
+      mailSent, // Return the signed JWT token
     });
   } catch (error) {
     console.error(error);
