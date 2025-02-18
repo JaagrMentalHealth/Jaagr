@@ -15,17 +15,24 @@ exports.protect = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
-    // console.log(token);
+    if (req.query.a) {
+      console.log("Inside Else if");
+      token = req.query.a;
+    }
+    console.log(token);
 
     if (!token) {
       return res.status(401).json({
         message: "You are not logged in! Please log in to get access.",
       });
     }
+    // console.log("Hi");
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log(decoded);
-    const currentUser = await User.findOne({ userName: decoded.id });
+    const currentUser =
+      (await User.findOne({ userName: decoded.id })) ||
+      (await User.findOne({ email: decoded.email }));
 
     if (!currentUser) {
       return res.status(401).json({
@@ -38,7 +45,7 @@ exports.protect = async (req, res, next) => {
   } catch (error) {
     return res
       .status(401)
-      .json({ message: "Invalid token. Please log in again!" });
+      .json({ message: "Invalid token. Please log in again!", error });
   }
 };
 

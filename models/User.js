@@ -49,8 +49,11 @@ const userSchema = new mongoose.Schema(
     },
     otp: { type: String },
     otpExpiresAt: { type: Date },
+    assessment:[{type: String}],
+    ghost: {type: Boolean,default: false}
   },
-  { timestamps: true }
+  { timestamps: true },
+  
 );
 
 userSchema.pre("save", async function (next) {

@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
 const otpRoutes = require("./routes/otpRoutes");
 const { sendOtp, verifyOtp } = require("./controllers/otpController"); // Corrected import
+const assessmentRoutes=require("./routes/assessmentRoutes")
 
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/otp", otpRoutes);
+app.use("/api/assessment",assessmentRoutes)
 
 app.use("/admin",adminApp)
 
