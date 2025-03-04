@@ -12,6 +12,7 @@ const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const errorHandler = require("./middleware/errorHandler");
 const adminApp = require("./admin_application/adminServer");
+const assessmentApp=require("./Assessment_backend/app")
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use("/api/otp", otpRoutes);
 app.use("/api/assessment",assessmentRoutes)
 
 app.use("/admin",adminApp)
+app.use("/assessment",assessmentApp)
 
 // Error handling middleware
 app.use(errorHandler);
@@ -51,7 +53,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("Connected to MongoDB"))
+  .then((conn) => console.log(`Connected to MongoDB ${conn.connection.host}`))
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Start the server
