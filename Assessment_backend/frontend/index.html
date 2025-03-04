@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mental Health Assessment</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .section { margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Mental Health Assessment Tool</h1>
+
+  <div class="section" id="phase1">
+    <h2>Phase 1: Initial Assessment</h2>
+    <button onclick="startPhase1()">Start Assessment</button>
+  </div>
+
+  <div class="section" id="phase2" style="display:none;">
+    <h2>Phase 2: Refinement</h2>
+    <button onclick="getPhase2Questions()">Get Refinement Questions</button>
+  </div>
+
+  <div class="section" id="phase3" style="display:none;">
+    <h2>Phase 3: Dynamic Validation</h2>
+    <button onclick="evaluatePhase3()">Get Recommendations</button>
+  </div>
+
+  <script>
+    async function startPhase1() {
+      const responses = {
+        restlessness: true, fatigue: false, "difficulty concentrating": true, irritability: true,
+        "persistent sadness": true, "loss of interest": false
+      };
+
+      const response = await fetch('http://localhost:3000/assess/phase1', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ responses })
+      });
+
+      const data = await response.json();
+      console.log('Phase 1 Results:', data);
+      document.getElementById('phase2').style.display = 'block';
+    }
+
+    async function getPhase2Questions() {
+      const topProblems = [{ problem: "anxiety" }, { problem: "depression" }];
+      const response = await fetch('http://localhost:3000/assess/phase2/questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topProblems })
+      });
+
+      const data = await response.json();
+      console.log('Phase 2 Questions:', data);
+      document.getElementById('phase3').style.display = 'block';
+    }
+
+    async function evaluatePhase3() {
+      const responses = {
+        anxiety: [true, false],
+        depression: [true, true]
+      };
+
+      const response = await fetch('http://localhost:3000/assess/phase3/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ responses })
+      });
+
+      const data = await response.json();
+      console.log('Phase 3 Results:', data);
+      alert(JSON.stringify(data.recommendations, null, 2));
+    }
+  </script>
+</body>
+</html>

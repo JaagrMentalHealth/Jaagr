@@ -1,0 +1,45 @@
+{
+    "diseases": [
+      {
+        "diseaseKey": "D001",
+        "name": "OCD",
+        "symptoms": ["Compulsive Acts", "Flashbacks", "Involuntary Thoughts", "Self Doubt", "Skittish"]
+      },
+      {
+        "diseaseKey": "D002",
+        "name": "Depression",
+        "symptoms": ["Eating Disorder", "Fatigue", "Insomnia", "Involuntary Thoughts", "Loss of Interest", "Low Concentration", "Mood Swings", "Self Doubt", "Self Harm", "Social Distance", "Self Care"]
+      },
+      {
+        "diseaseKey": "D003",
+        "name": "PTSD",
+        "symptoms": ["Flashbacks", "Insomnia", "Irritability", "Loss of Interest", "Low Concentration", "Restlessness", "Self Doubt", "Skittish", "Social Distance", "Panic Attacks"]
+      },
+      {
+        "diseaseKey": "D004",
+        "name": "Bipolar Disorder",
+        "symptoms": ["Insomnia", "Irritability", "Impulsive Behaviour", "Low Concentration", "Mood Swings", "Self Care"]
+      },
+      {
+        "diseaseKey": "D005",
+        "name": "Anxiety",
+        "symptoms": ["Insomnia", "Irritability", "Limiting Belief", "Loss of Interest", "Low Concentration", "Overthinking", "Panic Attacks", "Physical Discomfort", "Restlessness", "Social Distance"]
+      },
+      {
+        "diseaseKey": "D006",
+        "name": "Borderline Personality Disorder",
+        "symptoms": ["Disequilibrium", "Impulsive Behaviour", "Loss of Interest", "Mood Swings", "Overthinking", "Self Doubt", "Self Harm", "Limiting Belief"]
+      },
+      {
+        "diseaseKey": "D007",
+        "name": "Substance Use Disorder",
+        "symptoms": ["Addiction", "Loss of Interest", "Physical Discomfort"]
+      },
+      {
+        "diseaseKey": "D008",
+        "name": "ADHD",
+        "symptoms": ["Disequilibrium", "Impulsive Behaviour", "Low Concentration", "Mood Swings", "Restlessness", "Skittish"]
+      }
+    ]
+  }
+  

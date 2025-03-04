@@ -1,0 +1,702 @@
+{
+    "questionKey": "Q001",
+    "text": "How often do you continue using substances despite negative consequences in your life?",
+    "symptom": "Addiction",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q002",
+    "text": "How often do you experience strong cravings for substances (e.g., alcohol, drugs)?",
+    "symptom": "Addiction",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q003",
+    "text": "How frequently do you use substances in situations that could be dangerous (e.g., while driving)?",
+    "symptom": "Addiction",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q004",
+    "text": "How frequently do you find it difficult to limit or control your substance use?",
+    "symptom": "Addiction",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q005",
+    "text": "How frequently have you encountered legal problems related to substance use?",
+    "symptom": "Addiction",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q006",
+    "text": "How often does your substance use interfere with work, school, or home responsibilities?",
+    "symptom": "Addiction",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q007",
+    "text": "How frequently do you spend significant time obtaining, using, or recovering from substance use?",
+    "symptom": "Addiction",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q008",
+    "text": "How often do you find that you need larger amounts of a substance to achieve the same effect?",
+    "symptom": "Addiction",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q009",
+    "text": "How often do you rely on substances to help manage stress or emotional difficulties?",
+    "symptom": "Addiction",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q010",
+    "text": "How often does your substance use negatively affect your relationships?",
+    "symptom": "Addiction",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q011",
+    "text": "How often do you find it extremely difficult to let go of items due to sentimental value or fear of loss?",
+    "symptom": "Compulsive Acts",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q012",
+    "text": "How frequently do you struggle to discard items, even if they seem unnecessary?",
+    "symptom": "Compulsive Acts",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q013",
+    "text": "How frequently do you feel that things must be perfect, even if it disrupts your daily routine?",
+    "symptom": "Compulsive Acts",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q014",
+    "text": "How frequently do you engage in ritualistic behaviors to reduce anxiety?",
+    "symptom": "Compulsive Acts",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q015",
+    "text": "How frequently do you engage in rituals to ward off bad luck or negative outcomes?",
+    "symptom": "Compulsive Acts",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q016",
+    "text": "How frequently do you delay tasks until the last minute?",
+    "symptom": "Disequilibrium",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q017",
+    "text": "How frequently do you experience intense fluctuations in your relationships?",
+    "symptom": "Disequilibrium",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q018",
+    "text": "How frequently do you feel disorganized in your work or personal environment?",
+    "symptom": "Disequilibrium",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q019",
+    "text": "How often do you experience feelings of disconnection or detachment from reality?",
+    "symptom": "Disequilibrium",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q020",
+    "text": "How often do you feel uncertain or confused about your personal identity?",
+    "symptom": "Disequilibrium",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q021",
+    "text": "How frequently do you view people or situations in all-or-nothing terms?",
+    "symptom": "Disequilibrium",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q022",
+    "text": "How often have you noticed significant changes in your appetite or weight?",
+    "symptom": "Eating Disorder",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q023",
+    "text": "How often have you felt unusually fatigued or low on energy?",
+    "symptom": "Fatigue",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q024",
+    "text": "How frequently do you experience sudden emotional flashbacks of the trauma?",
+    "symptom": "Flashbacks",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q025",
+    "text": "How frequently do you relive a traumatic event as if it were happening again?",
+    "symptom": "Flashbacks",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q026",
+    "text": "How often do you experience unwanted, intrusive memories of a traumatic event?",
+    "symptom": "Flashbacks",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q027",
+    "text": "How frequently do you find yourself mentally reviewing past events repeatedly?",
+    "symptom": "Flashbacks",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q028",
+    "text": "How frequently do you engage in impulsive behaviors without considering the consequences?",
+    "symptom": "Impulsive Behaviour",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q029",
+    "text": "How frequently do you engage in impulsive actions that you later regret?",
+    "symptom": "Impulsive Behaviour",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q030",
+    "text": "How often do you make snap decisions without considering the consequences?",
+    "symptom": "Impulsive Behaviour",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q031",
+    "text": "How often do you act impulsively without considering the consequences?",
+    "symptom": "Impulsive Behaviour",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q032",
+    "text": "How often do you notice that your speech becomes unusually rapid or pressured?",
+    "symptom": "Impulsive Behaviour",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q033",
+    "text": "How often do you find that you require significantly less sleep than usual without feeling tired?",
+    "symptom": "Insomnia",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q034",
+    "text": "How frequently do you have trouble sleeping or sleep excessively?",
+    "symptom": "Insomnia",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q035",
+    "text": "How often does anxiety interfere with your ability to get a good night’s sleep?",
+    "symptom": "Insomnia",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q036",
+    "text": "How often do traumatic memories disrupt your sleep?",
+    "symptom": "Insomnia",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q037",
+    "text": "How often do you experience intrusive thoughts of a disturbing sexual or violent nature?",
+    "symptom": "Involuntary thoughts",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q038",
+    "text": "How often do you experience unwanted, disturbing mental images?",
+    "symptom": "Involuntary thoughts",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q039",
+    "text": "How often do you experience persistent, unwanted intrusive thoughts?",
+    "symptom": "Involuntary thoughts",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q040",
+    "text": "How often do you feel an overwhelming need for order or symmetry in your surroundings?",
+    "symptom": "Involuntary thoughts",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q041",
+    "text": "How often do you notice that your movements or speech seem slowed down or agitated?",
+    "symptom": "Involuntary thoughts",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q042",
+    "text": "How frequently do you engage in impulsive or excessive spending during periods of elevated mood?",
+    "symptom": "Involuntary thoughts",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q043",
+    "text": "How often do you find yourself engaging in sexual behaviors that seem uncharacteristic or risky?",
+    "symptom": "Involuntary thoughts",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q044",
+    "text": "How often do you feel unusually agitated or restless during periods of high energy?",
+    "symptom": "Irritability",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q045",
+    "text": "How often do you feel unusually irritable or on edge?",
+    "symptom": "Irritability",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q046",
+    "text": "How frequently do you feel irritable or experience bursts of anger without a clear cause?",
+    "symptom": "Irritability",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q047",
+    "text": "How frequently do you experience heightened irritability or frustration during mood swings?",
+    "symptom": "Irritability",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q048",
+    "text": "How often do you feel anxious in anticipation of upcoming stressful events?",
+    "symptom": "Limiting belief",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q049",
+    "text": "How frequently do you imagine worst-case scenarios in everyday situations?",
+    "symptom": "Limiting belief",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q050",
+    "text": "How often do you feel anxious about uncertain or future events?",
+    "symptom": "Limiting belief",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q051",
+    "text": "How often do you worry about being abandoned or rejected by those close to you?",
+    "symptom": "Limiting belief",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q052",
+    "text": "How often do you find that activities which once brought you joy no longer do?",
+    "symptom": "Loss of Interest",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q053",
+    "text": "How often do you worry excessively about various aspects of your life?",
+    "symptom": "Loss of Interest",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q054",
+    "text": "How often have you lost interest in activities you once enjoyed?",
+    "symptom": "Loss of Interest",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q055",
+    "text": "How often have you lost interest in activities you once enjoyed because of trauma?",
+    "symptom": "Loss of Interest",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q056",
+    "text": "How frequently do you feel a lack of motivation to engage in daily activities?",
+    "symptom": "Loss of Interest",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q057",
+    "text": "How frequently do you feel a persistent sense of emptiness or boredom?",
+    "symptom": "Loss of Interest",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q058",
+    "text": "How frequently have you lost interest in hobbies or activities because of substance use?",
+    "symptom": "Loss of Interest",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q059",
+    "text": "How often do you forget daily tasks, appointments, or details?",
+    "symptom": "Low Concentration",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q060",
+    "text": "How frequently do you jump from one task to another without finishing them?",
+    "symptom": "Low Concentration",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q061",
+    "text": "How often do you have difficulty concentrating on tasks?",
+    "symptom": "Low Concentration",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q062",
+    "text": "How often does anxiety make it difficult for you to concentrate?",
+    "symptom": "Low Concentration",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q063",
+    "text": "How often do trauma-related thoughts interfere with your ability to concentrate?",
+    "symptom": "Low Concentration",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q064",
+    "text": "How frequently do you find it challenging to follow multi-step instructions?",
+    "symptom": "Low Concentration",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q065",
+    "text": "How often do you find it hard to listen attentively during conversations?",
+    "symptom": "Low Concentration",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q066",
+    "text": "How frequently do you struggle to stay engaged with a task for an extended period?",
+    "symptom": "Low Concentration",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q067",
+    "text": "How often do you have difficulty focusing due to rapidly shifting thoughts?",
+    "symptom": "Low Concentration",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q068",
+    "text": "How often do you get sidetracked by external stimuli or wandering thoughts?",
+    "symptom": "Low Concentration",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q069",
+    "text": "How often do you find it difficult to maintain focus on tasks or conversations?",
+    "symptom": "Low Concentration",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q070",
+    "text": "How often do you misplace common items such as keys, phone, or documents?",
+    "symptom": "Low Concentration",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q071",
+    "text": "How often do you struggle to manage your time effectively?",
+    "symptom": "Low Concentration",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q072",
+    "text": "How often do you have an inflated sense of self or grandiose ideas about your abilities?",
+    "symptom": "Misconception",
+    "Disease": ""
+}
+{
+    "questionKey": "Q073",
+    "text": "How frequently do you find yourself taking on numerous projects or tasks at once?",
+    "symptom": "Misconception",
+    "Disease": ""
+}
+{
+    "questionKey": "Q074",
+    "text": "How often do you experience a significant drop in mood or energy following a period of high mood?",
+    "symptom": "Mood swings",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q075",
+    "text": "How often have you felt persistently sad or down?",
+    "symptom": "Mood swings",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q076",
+    "text": "How often do you experience periods of unusually elevated or euphoric mood?",
+    "symptom": "Mood swings",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q077",
+    "text": "How often do you feel excessively energetic or find it hard to remain calm when required?",
+    "symptom": "Mood swings",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q078",
+    "text": "How often do you experience uncontrollable bursts of anger?",
+    "symptom": "Mood swings",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q079",
+    "text": "How frequently do your emotions shift dramatically within a short period?",
+    "symptom": "Mood swings",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q080",
+    "text": "How often do you experience rapid and intense mood swings?",
+    "symptom": "Mood swings",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q081",
+    "text": "How frequently do you feel a surge of energy that is out of the ordinary for you?",
+    "symptom": "Mood swings",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q082",
+    "text": "How often do you experience overwhelming episodes of emotional pain or distress?",
+    "symptom": "Mood swings",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q083",
+    "text": "How frequently do you experience racing thoughts that disrupt your focus?",
+    "symptom": "Mood swings",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q084",
+    "text": "How often do you find yourself overthinking or ruminating on potential problems?",
+    "symptom": "Overthinking",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q085",
+    "text": "How frequently do you feel paranoid or overly suspicious when stressed?",
+    "symptom": "Overthinking",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q086",
+    "text": "How often do you have distressing nightmares related to a traumatic event?",
+    "symptom": "Panic Attacks",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q087",
+    "text": "How frequently do you experience sudden episodes of intense fear or panic?",
+    "symptom": "Panic Attacks",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q088",
+    "text": "How frequently do you experience muscle tension or tightness in your body?",
+    "symptom": "Physical Discomfort",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q089",
+    "text": "How frequently do you experience physical symptoms (e.g., sweating, trembling, rapid heartbeat) due to anxiety?",
+    "symptom": "Physical Discomfort",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q090",
+    "text": "How frequently do you experience physical or emotional symptoms when not using a substance?",
+    "symptom": "Physical Discomfort",
+    "Disease": "Substance Use Disorder"
+}
+{
+    "questionKey": "Q091",
+    "text": "How frequently do you experience a general sense of tension or unease throughout your day?",
+    "symptom": "Restlessness",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q092",
+    "text": "How often do you feel overly alert or constantly on guard?",
+    "symptom": "Restlessness",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q093",
+    "text": "How often do you feel restless or unable to relax?",
+    "symptom": "Restlessness",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q094",
+    "text": "How frequently do you experience a constant sense of restlessness or need for activity?",
+    "symptom": "Restlessness",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q095",
+    "text": "How often have you neglected self-care activities, such as personal hygiene or nutrition?",
+    "symptom": "Self Care",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q096",
+    "text": "How frequently do you neglect routine self-care during periods of elevated mood?",
+    "symptom": "Self Care",
+    "Disease": "Bipolar Disorder"
+}
+{
+    "questionKey": "Q097",
+    "text": "How often do you feel hopeless about the future?",
+    "symptom": "Self Doubt",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q098",
+    "text": "How often do you irrationally blame yourself or others for the traumatic event?",
+    "symptom": "Self Doubt",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q099",
+    "text": "How often do you experience feelings of worthlessness or excessive guilt?",
+    "symptom": "Self Doubt",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q100",
+    "text": "How often do you feel undue guilt or shame related to the traumatic event?",
+    "symptom": "Self Doubt",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q101",
+    "text": "How frequently do you criticize yourself or feel inadequate?",
+    "symptom": "Self Doubt",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q102",
+    "text": "How often do you experience intense doubt about your decisions or actions?",
+    "symptom": "Self Doubt",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q103",
+    "text": "How often do you feel that your sense of self or self-image is inconsistent?",
+    "symptom": "Self Doubt",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q104",
+    "text": "How often do you experience thoughts about death or suicide?",
+    "symptom": "Self harm",
+    "Disease": "Depression"
+}
+{
+    "questionKey": "Q105",
+    "text": "How frequently have you engaged in behaviors that intentionally cause you physical harm?",
+    "symptom": "Self harm",
+    "Disease": "Borderline personality disorder"
+}
+{
+    "questionKey": "Q106",
+    "text": "How frequently do you feel compelled to check things repeatedly (e.g., locks, appliances)?",
+    "symptom": "Skittish",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q107",
+    "text": "How often do you feel the need to clean or wash excessively?",
+    "symptom": "Skittish",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q108",
+    "text": "How often do you worry excessively about germs or contamination?",
+    "symptom": "Skittish",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q109",
+    "text": "How frequently do you find yourself counting or repeating actions in a specific pattern?",
+    "symptom": "Skittish",
+    "Disease": "OCD"
+}
+{
+    "questionKey": "Q110",
+    "text": "How frequently are you easily startled by sudden noises or unexpected events?",
+    "symptom": "Skittish",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q111",
+    "text": "How often do you find yourself fidgeting or feeling the need to move constantly?",
+    "symptom": "Skittish",
+    "Disease": "ADHD"
+}
+{
+    "questionKey": "Q112",
+    "text": "How often do you avoid situations because they trigger your anxiety?",
+    "symptom": "Social Distance",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q113",
+    "text": "How frequently do you avoid places, people, or activities that remind you of a traumatic event?",
+    "symptom": "Social Distance",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q114",
+    "text": "How often do you feel detached from reality or experience memory gaps during stressful moments?",
+    "symptom": "Social Distance",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q115",
+    "text": "How often do you feel emotionally detached or numb?",
+    "symptom": "Social Distance",
+    "Disease": "PTSD"
+}
+{
+    "questionKey": "Q116",
+    "text": "How frequently do you feel anxious in social situations or when meeting new people?",
+    "symptom": "Social Distance",
+    "Disease": "Anxiety"
+}
+{
+    "questionKey": "Q117",
+    "text": "How often do you avoid social interactions or feel isolated?",
+    "symptom": "Social Distance",
+    "Disease": "Depression"
+}
