@@ -1,4 +1,4 @@
-const User = require("../models/user");
+const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { OAuth2Client } = require("google-auth-library");
@@ -107,6 +107,63 @@ exports.googleLogin = async (req, res) => {
       status: "error",
       message: error.message || "An error occurred during Google login",
     });
+  }
+};
+
+exports.createGhostProfile = async (req, res) => {
+  try {
+    const { email, fullName } = req.body;
+
+    // Check if the user already exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        email,
+        fullName,
+        userName: email.split("@")[0],
+        password: email.split("@")[0],
+        ghost: true, // Mark as a ghost user
+      });
+
+      // const registrationLink = `https://yourapp.com/register/${token}`;
+
+      // Generate a signed JWT token for the user (valid for 28 days)
+      const authToken = jwt.sign(
+        { email: user.email },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "28d",
+        }
+      );
+      const message = `Hello ${fullName} Kindly Visit the following Link to start your assessment http://localhost:3000/self-assessment/organisation?a=${authToken}`;
+      const mailSent = await Mailer(email, message, "Dummy Assessment Link");
+
+      return res.status(201).json({
+        message: "Ghost profile created successfully",
+        userId: user._id,
+        // registrationLink,
+        authToken, // Return the signed JWT token
+      });
+    }
+
+    // Generate a signed JWT token for an existing user (valid for 28 days)
+
+    const authToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+      expiresIn: "28d",
+    });
+    console.log(authToken);
+    const message = `Hello ${fullName} Kindly Visit the following Link to start your assessment http://localhost:3000/self-assessment/organisation?a=${authToken}`;
+    const mailSent = await Mailer(email, message, "Dummy Assessment Link");
+    return res.status(200).json({
+      message: "User already exists",
+      userId: user._id,
+      authToken,
+      mailSent, // Return the signed JWT token
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

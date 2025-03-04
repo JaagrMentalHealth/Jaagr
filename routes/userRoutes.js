@@ -27,4 +27,6 @@ router.get("/change-password",authMiddleware.protect,userController.changePasswo
 
 router.post("/change-password",userController.changePassword)
 
+router.post("/ghost-profile",userController.createGhostProfile)
+
 module.exports = router;

@@ -6,11 +6,13 @@ const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
 const otpRoutes = require("./routes/otpRoutes");
 const { sendOtp, verifyOtp } = require("./controllers/otpController"); // Corrected import
+const assessmentRoutes=require("./routes/assessmentRoutes")
 
 const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const errorHandler = require("./middleware/errorHandler");
 const adminApp = require("./admin_application/adminServer");
+const assessmentApp=require("./Assessment_backend/app")
 
 dotenv.config();
 
@@ -36,8 +38,10 @@ app.use((req, res, next) => {
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/otp", otpRoutes);
+app.use("/api/assessment",assessmentRoutes)
 
 app.use("/admin",adminApp)
+app.use("/assessment",assessmentApp)
 
 // Error handling middleware
 app.use(errorHandler);
@@ -49,7 +53,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("Connected to MongoDB"))
+  .then((conn) => console.log(`Connected to MongoDB ${conn.connection.host}`))
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Start the server
