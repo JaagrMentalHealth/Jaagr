@@ -1,0 +1,122 @@
+{
+    "symptomKey": "S001",
+    "name": "Addiction",
+    "diseases": ["Substance Use Disorder"]
+}
+{
+    "symptomKey": "S002",
+    "name": "Compulsive Acts",
+    "diseases": ["OCD"]
+}
+{
+    "symptomKey": "S003",
+    "name": "Disequilibrium",
+    "diseases": ["Borderline personality disorder","ADHD"]
+}
+{
+    "symptomKey": "S004",
+    "name": "Eating Disorder",
+    "diseases": ["Depression"]
+}
+{
+    "symptomKey": "S005",
+    "name": "Fatigue",
+    "diseases": ["Depression"]
+}
+{
+    "symptomKey": "S006",
+    "name": "Flashbacks",
+    "diseases": ["PTSD","OCD"]
+} 
+{
+    "symptomKey": "S007",
+    "name": "Impulsive Behaviour",
+    "diseases": ["Bipolar Disorder","Borderline personality disorder","ADHD"]
+}
+{
+    "symptomKey": "S008",
+    "name": "Insomnia",
+    "diseases": ["Bipolar Disorder","Depression","Anxiety","PTSD"]
+}
+{
+    "symptomKey": "S009",
+    "name": "Involuntary thoughts",
+    "diseases": ["OCD","Bipolar Disorder","Depression"]
+}
+{
+    "symptomKey": "S010",
+    "name": "Irritability",
+    "diseases": ["Bipolar Disorder","Anxiety","PTSD"]
+}
+{
+    "symptomKey": "S011",
+    "name": "Limiting belief",
+    "diseases": ["Anxiety","Borderline personality disorder"]
+}
+
+{
+    "symptomKey": "S012",
+    "name": "Loss of Interest",
+    "diseases": ["Depression","Anxiety","PTSD","Substance Use Disorder","Borderline personality disorder"]
+}
+{
+    "symptomKey": "S013",
+    "name": "Low Concentration",
+    "diseases": ["ADHD","Depression","Anxiety","PTSD","Bipolar Disorder"]
+}
+
+{
+    "symptomKey": "S014",
+    "name": "Misconception",
+    "diseases": ["Bipolar Disorder"]
+}
+{
+    "symptomKey": "S015",
+    "name": "Mood swings",
+    "diseases": ["Bipolar Disorder","Depression","ADHD","Borderline personality disorder"]
+}
+{
+    "symptomKey": "S016",
+    "name": "Overthinking",
+    "diseases": ["Anxiety","Borderline personality disorder"]
+}
+{
+    "symptomKey": "S017",
+    "name": "Panic Attacks",
+    "diseases": ["PTSD","Anxiety"]
+}
+{
+    "symptomKey": "S018",
+    "name": "Physical Discomfort",
+    "diseases": ["Anxiety","Substance Use Disorder"]
+}
+{
+    "symptomKey": "S019",
+    "name": "Restlessness",
+    "diseases": ["Anxiety","PTSD","ADHD"]
+}
+{
+    "symptomKey": "S020",
+    "name": "Self Care",
+    "diseases": ["Depression","Bipolar Disorder"]
+}
+{
+    "symptomKey": "S021",
+    "name": "Self Doubt",
+    "diseases": ["Depression","PTSD","OCD","Borderline personality disorder"]
+}
+{
+    "symptomKey": "S022",
+    "name": "Self harm",
+    "diseases": ["Depression","Borderline personality disorder"]
+}
+{
+    "symptomKey": "S023",
+    "name": "Skittish",
+    "diseases": ["OCD","PTSD","ADHD"]
+}
+{
+    "symptomKey": "S024",
+    "name": "Social Distance",
+    "diseases": ["Anxiety","PTSD","Depression"]
+}
