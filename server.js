@@ -12,7 +12,7 @@ const userRoutes = require("./routes/userRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const errorHandler = require("./middleware/errorHandler");
 const adminApp = require("./admin_application/adminServer");
-const assessmentApp=require("./Assessment_backend/app")
+const assessmentApp=require("./assessment_v2/app")
 
 dotenv.config();
 
