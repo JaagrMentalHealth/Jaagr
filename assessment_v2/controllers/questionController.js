@@ -1,5 +1,7 @@
 // controllers/questionController.js
 const Question = require("../models/Question");
+const Disease = require('../models/Disease');
+
 
 // Create Question
 exports.createQuestion = async (req, res) => {
@@ -12,9 +14,7 @@ exports.createQuestion = async (req, res) => {
   }
 };
 
-// Bulk Upload Questions
-const Question = require('../models/Question');
-const Disease = require('../models/Disease');
+
 
 exports.bulkUploadQuestions = async (req, res) => {
   try {
