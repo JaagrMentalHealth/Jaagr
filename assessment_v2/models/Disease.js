@@ -1,9 +1,9 @@
-// models/Disease.js
 const mongoose = require("mongoose");
 
 const DiseaseSchema = new mongoose.Schema({
-  diseaseName: { type: String, required: true, unique: true },
-  minimumScreening: { type: Number, required: true }, // Minimum screening questions to flag
+  diseaseName: { type: String, required: true, unique: true }, // Clinical term
+  assessmentParameter: { type: String, required: true }, // Friendly label for reports
+  minimumScreening: { type: Number, required: true },
   minimumSeverity: {
     mild: { type: Number, required: true },
     moderate: { type: Number, required: true },
@@ -13,6 +13,23 @@ const DiseaseSchema = new mongoose.Schema({
     type: String,
     enum: ["Alarming", "Moderate", "Less Alarming"],
     required: true,
+  },
+  reportText: {
+    mild: {
+      whatItMeans: { type: String },
+      howItFeels: { type: String },
+      whatCanHelp: { type: String },
+    },
+    moderate: {
+      whatItMeans: { type: String },
+      howItFeels: { type: String },
+      whatCanHelp: { type: String },
+    },
+    severe: {
+      whatItMeans: { type: String },
+      howItFeels: { type: String },
+      whatCanHelp: { type: String },
+    },
   },
 });
 

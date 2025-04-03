@@ -1,6 +1,7 @@
 // controllers/assessmentController.js
 const Question = require("../models/Question");
 const Disease = require("../models/Disease");
+const AssessmentOutcome = require("../models/AssessmentOutcome");
 
 // Generate Warmup Questions
 exports.getWarmupQuestions = async (req, res) => {
@@ -15,8 +16,21 @@ exports.getWarmupQuestions = async (req, res) => {
 // Submit Warmup and Generate Screening Questions
 exports.submitWarmup = async (req, res) => {
   try {
+    const { warmupAnswers, userId, organizationId, assessmentId } = req.body;
+
+    // Create new outcome record
+    const outcome = new AssessmentOutcome({
+      userId,
+      organizationId,
+      assessmentId,
+      type: "Emotional Well Being V1",
+      warmupResponses: warmupAnswers,
+    });
+
+    await outcome.save();
+
     const screeningQuestions = await Question.find({ phase: 1 });
-    res.status(200).json(screeningQuestions);
+    res.status(200).json({ screeningQuestions, outcomeId: outcome._id });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -25,13 +39,23 @@ exports.submitWarmup = async (req, res) => {
 // Submit Screening and Generate Severity Questions
 exports.submitScreening = async (req, res) => {
   try {
-    const { answers } = req.body; // Array of { questionId, answer }
-    const diseases = await Disease.find();
+    const { screeningAnswers, outcomeId } = req.body;
 
+    const outcome = await AssessmentOutcome.findById(outcomeId);
+    if (!outcome) {
+      return res.status(404).json({ error: "Outcome not found" });
+    }
+
+    outcome.screeningResponses = screeningAnswers;
+    await outcome.save();
+
+    const diseases = await Disease.find();
     const flaggedDiseases = [];
+
     for (const disease of diseases) {
       const questions = await Question.find({ disease: disease._id, phase: 1 });
-      const validCount = answers.filter((ans) =>
+
+      const validCount = screeningAnswers.filter((ans) =>
         questions.some(
           (q) =>
             q._id.equals(ans.questionId) && q.validOptions.includes(ans.answer)
@@ -47,22 +71,33 @@ exports.submitScreening = async (req, res) => {
       disease: { $in: flaggedDiseases },
       phase: 2,
     });
-    res.status(200).json(severityQuestions);
+
+    res.status(200).json({ severityQuestions });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
 // Submit Severity and Generate Report
+// Submit Severity and Generate Report
 exports.submitSeverity = async (req, res) => {
   try {
-    const { answers } = req.body;
-    const diseases = await Disease.find();
+    const { severityAnswers, outcomeId } = req.body;
 
+    const outcome = await AssessmentOutcome.findById(outcomeId);
+    if (!outcome) {
+      return res.status(404).json({ error: "Outcome not found" });
+    }
+
+    outcome.severityResponses = severityAnswers;
+
+    const diseases = await Disease.find();
     const results = [];
+
     for (const disease of diseases) {
       const questions = await Question.find({ disease: disease._id, phase: 2 });
-      const severityCount = answers.filter((ans) =>
+
+      const severityCount = severityAnswers.filter((ans) =>
         questions.some(
           (q) =>
             q._id.equals(ans.questionId) && q.validOptions.includes(ans.answer)
@@ -76,13 +111,29 @@ exports.submitSeverity = async (req, res) => {
         severityLevel = "Moderate";
       }
 
+      const reportText = disease.reportText?.[severityLevel.toLowerCase()] || {};
+      const parameter = disease.assessmentParameter || disease.diseaseName;
+
       results.push({
         disease: disease.diseaseName,
         severity: severityLevel,
+        assessmentParameter: parameter,
+        reportText: {
+          whatItMeans: reportText.whatItMeans || "",
+          howItFeels: reportText.howItFeels || "",
+          whatCanHelp: reportText.whatCanHelp || "",
+        },
       });
     }
 
-    res.status(200).json(results);
+    outcome.results = results;
+    await outcome.save();
+
+    res.status(200).json({
+      message: "Assessment completed",
+      outcomeId: outcome._id,
+      results,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
