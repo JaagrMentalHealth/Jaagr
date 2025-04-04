@@ -1,7 +1,7 @@
 // controllers/assessmentController.js
 const Question = require("../models/Question");
 const Disease = require("../models/Disease");
-const AssessmentOutcome = require("../models/AssessmentOutcome");
+const AssessmentOutcome = require("../models/assessmentOutcome");
 
 // Generate Warmup Questions
 exports.getWarmupQuestions = async (req, res) => {
