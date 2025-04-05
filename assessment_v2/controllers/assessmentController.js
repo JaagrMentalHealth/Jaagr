@@ -1,9 +1,13 @@
 // controllers/assessmentController.js
 const Question = require("../models/Question");
 const Disease = require("../models/Disease");
-const AssessmentOutcome = require("../models/assessmentOutcome");
-
+const AssessmentOutcome = require("../models/AssessmentOutcome");
+const User = require("../../models/User");
+const OrgUser = require("../../admin_application/models/orgUser");
 // Generate Warmup Questions
+
+
+
 exports.getWarmupQuestions = async (req, res) => {
   try {
     const questions = await Question.find({ phase: 0 });
@@ -16,23 +20,48 @@ exports.getWarmupQuestions = async (req, res) => {
 // Submit Warmup and Generate Screening Questions
 exports.submitWarmup = async (req, res) => {
   try {
-    const { warmupAnswers, userId, organizationId, assessmentId } = req.body;
+    const { warmupAnswers, organizationId, assessmentId, orgUserId } = req.body;
 
-    // Create new outcome record
+    // Use JWT-based user if available, else fallback to orgUserId
+    const jwtUserId = req.user ? req.user._id : null;
+    const finalUserId = jwtUserId || orgUserId;
+
+    if (!finalUserId) {
+      return res.status(400).json({ error: "User or OrgUser ID is required" });
+    }
+
+    // Create new assessment outcome
     const outcome = new AssessmentOutcome({
-      userId,
-      organizationId,
+      userId: finalUserId,
+      ...(organizationId && { organizationId }),
       assessmentId,
       type: "Emotional Well Being V1",
       warmupResponses: warmupAnswers,
     });
 
     await outcome.save();
+    console.log("outcome saved")
 
-    const screeningQuestions = await Question.find({ phase: 1 });
-    res.status(200).json({ screeningQuestions, outcomeId: outcome._id });
+    // Update User or OrgUser
+    if (jwtUserId) {
+      await User.findByIdAndUpdate(jwtUserId, {
+        $push: { assessment: outcome._id },
+      });
+    } else if (orgUserId) {
+      await OrgUser.findByIdAndUpdate(orgUserId, {
+        $set: { assessmentId: outcome._id },
+      });
+    }
+
+    const screeningQuestions = await Question.find({ phase: 0 });
+    console.log("Screening Questions Fetched")
+    return res.status(200).json({
+      screeningQuestions,
+      outcomeId: outcome._id,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("Submit Warmup Error:", error.message);
+    return res.status(400).json({ error: error.message });
   }
 };
 
@@ -40,7 +69,7 @@ exports.submitWarmup = async (req, res) => {
 exports.submitScreening = async (req, res) => {
   try {
     const { screeningAnswers, outcomeId } = req.body;
-
+    console.log("Api Hit")
     const outcome = await AssessmentOutcome.findById(outcomeId);
     if (!outcome) {
       return res.status(404).json({ error: "Outcome not found" });
@@ -74,6 +103,7 @@ exports.submitScreening = async (req, res) => {
 
     res.status(200).json({ severityQuestions });
   } catch (error) {
+    console.log(error)
     res.status(400).json({ error: error.message });
   }
 };
@@ -138,3 +168,18 @@ exports.submitSeverity = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+
+
+
+exports.getOutcomeById = async (req, res) => {
+  try {
+    const outcome = await AssessmentOutcome.findById(req.params.outcomeId);
+    if (!outcome) {
+      return res.status(404).json({ error: "Outcome not found" });
+    }
+    res.status(200).json(outcome);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}

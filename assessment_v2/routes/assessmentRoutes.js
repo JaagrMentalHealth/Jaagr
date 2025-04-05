@@ -7,5 +7,6 @@ router.get("/warmup", assessmentController.getWarmupQuestions);
 router.post("/submit-warmup", assessmentController.submitWarmup);
 router.post("/submit-screening", assessmentController.submitScreening);
 router.post("/submit-severity", assessmentController.submitSeverity);
+router.get("/outcome/:outcomeId",assessmentController.getOutcomeById)
 
 module.exports = router;

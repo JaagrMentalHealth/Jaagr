@@ -68,3 +68,23 @@ exports.restrictToAuthor = async (req, res, next) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+
+
+exports.optionalAuth = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer")) {
+    const token = authHeader.split(" ")[1];
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findOne({ userName: decoded.id }) || await User.findOne({ email: decoded.email });
+      if (user) {
+        req.user = user;
+      }
+    } catch (err) {
+      console.warn("JWT verification failed but proceeding anonymously.");
+    }
+  }
+  next();
+};
+
+
