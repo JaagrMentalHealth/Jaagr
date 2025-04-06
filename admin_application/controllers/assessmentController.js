@@ -1,7 +1,7 @@
 const Assessment = require("../models/Assessment")
 const ExcelJS = require("exceljs");
 const OrgUser = require("../models/orgUser");
-const AssessmentOutcome = require("../../assessment_v2/models/AssessmentOutcome");
+const AssessmentOutcome = require("../../assessment_v2/models/assessmentOutcome");
 const Organisation = require("../models/organisation.model");
 
 // Create Assessment under an organization

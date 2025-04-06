@@ -1,7 +1,7 @@
 // controllers/assessmentController.js
 const Question = require("../models/Question");
 const Disease = require("../models/Disease");
-const AssessmentOutcome = require("../models/AssessmentOutcome");
+const AssessmentOutcome = require("../models/assessmentOutcome");
 const User = require("../../models/User");
 const OrgUser = require("../../admin_application/models/orgUser");
 // Generate Warmup Questions
