@@ -47,11 +47,7 @@ exports.submitWarmup = async (req, res) => {
       await User.findByIdAndUpdate(jwtUserId, {
         $push: { assessment: outcome._id },
       });
-    } else if (orgUserId) {
-      await OrgUser.findByIdAndUpdate(orgUserId, {
-        $set: { assessmentId: outcome._id },
-      });
-    }
+    } 
 
     const screeningQuestions = await Question.find({ phase: 0 });
     console.log("Screening Questions Fetched")

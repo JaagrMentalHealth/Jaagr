@@ -5,7 +5,7 @@ const OrgUserSchema = new mongoose.Schema({
   email: { type: String, required: true },
   phone: String,
   assessmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Assessment"},
-  organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization", required: true },
+  organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organisation", required: true },
   metadata: Object // optional: designation, batch, etc.
 })
 

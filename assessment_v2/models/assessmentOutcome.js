@@ -9,7 +9,7 @@ const AssessmentOutcomeSchema = new mongoose.Schema({
   },
   organizationId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Organization",
+    ref: "Organisation",
     required: false,
   },
   assessmentId: {

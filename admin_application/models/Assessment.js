@@ -6,7 +6,7 @@ const AssessmentSchema = new mongoose.Schema({
   description: { type: String },
   duration: { type: Number }, // in minutes
   validUntil: { type: Date },
-  organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization", required: true },
+  organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organisation", required: true },
 }, { timestamps: true })
 
 module.exports = mongoose.model("Assessment", AssessmentSchema)

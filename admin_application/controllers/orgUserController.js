@@ -2,6 +2,7 @@ const csv = require("csv-parser");
 const OrgUser = require("../models/orgUser");
 const fs=require("fs")
 const {Mailer}=require("../../utils/mailer")
+require('dotenv')
 
 // Create single user
 exports.createOrgUser = async (req, res) => {
@@ -65,6 +66,7 @@ exports.uploadOrgUsersCSV = async (req, res) => {
       }
   
       const { organizationId, assessmentId, emailSubject, emailMessage } = req.body;
+      const URL=process.env.FRONTEND_URL
   
       if (!organizationId || !assessmentId || !emailSubject || !emailMessage) {
         return res.status(400).json({
@@ -103,8 +105,11 @@ exports.uploadOrgUsersCSV = async (req, res) => {
             for (const user of inserted) {
               const personalizedText = emailMessage
                 .replace("[Name]", user.fullName)
-                .replace("[Assessment Link]", `https://yourapp.com/assessment/${assessmentId}?user=${user._id}`);
-  
+                .replace(
+                  "[Assessment Link]",
+                  `${URL}/diagnose?organizationId=${user.organizationId}&orgUserId=${user._id}&assessmentId=${assessmentId}`
+                );
+            
               await Mailer(user.email, personalizedText, emailSubject);
             }
   
