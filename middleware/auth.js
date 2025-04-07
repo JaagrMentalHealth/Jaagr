@@ -19,7 +19,7 @@ exports.protect = async (req, res, next) => {
       console.log("Inside Else if");
       token = req.query.a;
     }
-    console.log(token);
+    // console.log(token);
 
     if (!token) {
       return res.status(401).json({
@@ -29,7 +29,7 @@ exports.protect = async (req, res, next) => {
     // console.log("Hi");
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
+    // console.log(decoded);
     const currentUser =
       (await User.findOne({ userName: decoded.id })) ||
       (await User.findOne({ email: decoded.email }));
@@ -74,9 +74,12 @@ exports.optionalAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith("Bearer")) {
     const token = authHeader.split(" ")[1];
+    // console.log(token)
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      // console.log(decoded)
       const user = await User.findOne({ userName: decoded.id }) || await User.findOne({ email: decoded.email });
+      console.log(user)
       if (user) {
         req.user = user;
       }

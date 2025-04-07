@@ -24,7 +24,9 @@ exports.submitWarmup = async (req, res) => {
 
     // Use JWT-based user if available, else fallback to orgUserId
     const jwtUserId = req.user ? req.user._id : null;
+    // console.log(req.user)
     const finalUserId = jwtUserId || orgUserId;
+    // console.log(finalUserId)
 
     if (!finalUserId) {
       return res.status(400).json({ error: "User or OrgUser ID is required" });
@@ -49,7 +51,7 @@ exports.submitWarmup = async (req, res) => {
       });
     } 
 
-    const screeningQuestions = await Question.find({ phase: 0 });
+    const screeningQuestions = await Question.find({ phase: 1 });
     console.log("Screening Questions Fetched")
     return res.status(200).json({
       screeningQuestions,
@@ -91,6 +93,8 @@ exports.submitScreening = async (req, res) => {
         flaggedDiseases.push(disease._id);
       }
     }
+
+    console.log(flaggedDiseases)
 
     const severityQuestions = await Question.find({
       disease: { $in: flaggedDiseases },

@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     email: {
+      
       type: String,
       required: true,
       unique: true,
@@ -49,7 +50,7 @@ const userSchema = new mongoose.Schema(
     },
     otp: { type: String },
     otpExpiresAt: { type: Date },
-    assessment:[{type: String}],
+    assessment:[{ type: mongoose.Schema.Types.ObjectId, ref: "AssessmentOutcome" }],
     ghost: {type: Boolean,default: false}
   },
   { timestamps: true },
