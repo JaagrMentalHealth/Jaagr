@@ -3,6 +3,7 @@ const {
   createAdmin,
   updateAdmin,
   deleteAdmin,
+  getMyProfile,
 } = require("../controllers/adminController");
 const protect = require("../middlewares/authMiddleware");
 const roleMiddleware = require("../middlewares/roleMiddleware");
@@ -15,7 +16,11 @@ router.post(
   roleMiddleware(["master_admin", "super_admin"]),
   createAdmin
 );
+
+router.get("/me", protect, getMyProfile); // 👈 Add this route
+
 router.put("/update", protect, updateAdmin);
+
 router.delete(
   "/:id",
   protect,
