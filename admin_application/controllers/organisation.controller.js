@@ -1,4 +1,6 @@
 const Organisation = require('../models/organisation.model');
+const OrgUser=require('../models/orgUser')
+const Assessment=require('../models/Assessment')
 
 // Create
 exports.createOrganisation = async (req, res) => {
@@ -49,9 +51,18 @@ exports.updateOrganisation = async (req, res) => {
 // Delete
 exports.deleteOrganisation = async (req, res) => {
   try {
-    const deleted = await Organisation.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ error: 'Organisation not found' });
-    res.status(200).json({ message: 'Organisation deleted' });
+    const organizationId = req.params.id;
+
+    // Delete the organisation
+    const deleted = await Organisation.findByIdAndDelete(organizationId);
+    if (!deleted) return res.status(404).json({ error: "Organisation not found" });
+
+    // Delete all users associated with the organisation
+    await OrgUser.deleteMany({ organizationId });
+
+    await Assessment.deleteMany({ organizationId });
+
+    res.status(200).json({ message: "Organisation and its users deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

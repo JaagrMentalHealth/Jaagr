@@ -7,6 +7,6 @@ const OrgUserSchema = new mongoose.Schema({
   assessmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Assessment"},
   organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organisation", required: true },
   metadata: Object // optional: designation, batch, etc.
-})
+}, { timestamps: true })
 
 module.exports = mongoose.model("OrgUser", OrgUserSchema)
