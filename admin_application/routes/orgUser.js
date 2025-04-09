@@ -9,12 +9,14 @@ const {
   getOrgUserById,
   updateOrgUser,
   deleteOrgUser,
-  uploadOrgUsersCSV
+  uploadOrgUsersCSV,
+  getOrgUserCountByOrg
 } = require("../controllers/orgUserController");
 
 // Standard CRUD
 router.post("/", createOrgUser);
 router.get("/organization/:orgId", getOrgUsersByOrg);
+router.get("/count/:orgId",getOrgUserCountByOrg)
 router.get("/:id", getOrgUserById);
 router.put("/:id", updateOrgUser);
 router.delete("/:id", deleteOrgUser);
