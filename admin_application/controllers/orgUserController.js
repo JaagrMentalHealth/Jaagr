@@ -136,3 +136,56 @@ exports.uploadOrgUsersCSV = async (req, res) => {
       return res.status(500).json({ error: err.message });
     }
   };
+
+  // const OrgUser = require("../models/orgUser");
+  const AssessmentOutcome = require("../../assessment_v2/models/assessmentOutcome");
+  
+  exports.getOrgUsersByOrgAndAssessment = async (req, res) => {
+    try {
+      const { orgId, assessmentId } = req.params;
+  
+      const users = await OrgUser.find({ organizationId: orgId, assessmentId });
+  
+      const enrichedUsers = await Promise.all(
+        users.map(async (user) => {
+          const outcome = await AssessmentOutcome.findOne({
+            organizationId: orgId,
+            assessmentId,
+            userId: user._id,
+          });
+  
+          let status = "Pending";
+          let riskFactor = "Unknown";
+          let outcomeId = null;
+  
+          if (outcome) {
+            outcomeId = outcome._id;
+            if (!outcome.results || outcome.results.length === 0) {
+              status = "Completed";
+              riskFactor = "None";
+            } else {
+              status = "Completed";
+  
+              // Determine highest severity
+              const severities = outcome.results.map((r) => r.severity);
+              if (severities.includes("Severe")) riskFactor = "Severe";
+              else if (severities.includes("Moderate")) riskFactor = "Moderate";
+              else if (severities.includes("Mild")) riskFactor = "Mild";
+              else riskFactor = "None";
+            }
+          }
+  
+          return {
+            ...user.toObject(),
+            status,
+            riskFactor,
+            outcomeId,
+          };
+        })
+      );
+  
+      res.status(200).json(enrichedUsers);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  };

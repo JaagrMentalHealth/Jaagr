@@ -10,7 +10,8 @@ const {
   updateOrgUser,
   deleteOrgUser,
   uploadOrgUsersCSV,
-  getOrgUserCountByOrg
+  getOrgUserCountByOrg,
+  getOrgUsersByOrgAndAssessment
 } = require("../controllers/orgUserController");
 
 // Standard CRUD
@@ -20,6 +21,7 @@ router.get("/count/:orgId",getOrgUserCountByOrg)
 router.get("/:id", getOrgUserById);
 router.put("/:id", updateOrgUser);
 router.delete("/:id", deleteOrgUser);
+router.get("/org/:orgId/assessment/:assessmentId", getOrgUsersByOrgAndAssessment);
 
 // CSV Upload
 router.post("/upload/csv", upload.single("file"), uploadOrgUsersCSV);
