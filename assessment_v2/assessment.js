@@ -5,6 +5,7 @@ const connectDB = require("./utils/db");
 const diseaseRoutes = require("./routes/diseaseRoutes");
 const questionRoutes = require("./routes/questionRoutes");
 const assessmentRoutes = require("./routes/assessmentRoutes");
+const assessmentTypesRoutes=require("./routes/assessmentAdminRoutes")
 
 const assessmentApp = express();
 
@@ -18,6 +19,7 @@ assessmentApp.use(cors());
 assessmentApp.use("/diseases", diseaseRoutes);
 assessmentApp.use("/questions", questionRoutes);
 assessmentApp.use("/assessment", assessmentRoutes);
+assessmentApp.use("/admin",assessmentTypesRoutes)
 
 assessmentApp.use((err, req, res, next) => {
   console.error(err.stack);
