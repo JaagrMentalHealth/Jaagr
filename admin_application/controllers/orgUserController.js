@@ -61,7 +61,8 @@ exports.deleteOrgUser = async (req, res) => {
 exports.getOrgUserCountByOrg = async (req, res) => {
   try {
     const { orgId } = req.params;
-    const count = await OrgUser.countDocuments({ organizationId: orgId });
+    const uniqueEmails = await OrgUser.distinct("email", { organizationId: orgId });
+    const count=uniqueEmails.length;
     res.status(200).json({ organizationId: orgId, userCount: count });
   } catch (error) {
     res.status(500).json({ error: error.message });
