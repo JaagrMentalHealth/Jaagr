@@ -1,15 +1,22 @@
 const AssessmentTypes = require("../models/Assessment");
+const Disease=require("../models/Disease")
+const Question=require("../models/Question")
+
 
 exports.createAssessment = async (req, res) => {
   try {
+    // Create a log entry string
+    
+
+    // Proceed with saving the assessment
     const assessment = new AssessmentTypes(req.body);
     await assessment.save();
+
     res.status(201).json(assessment);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
-
 exports.getAllAssessments = async (req, res) => {
   try {
     const assessments = await AssessmentTypes.find()

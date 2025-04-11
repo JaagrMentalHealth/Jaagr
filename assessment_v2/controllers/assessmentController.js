@@ -4,23 +4,43 @@ const AssessmentTypes = require("../models/Assessment");
 const AssessmentOutcome = require("../models/assessmentOutcome");
 const User = require("../../models/User");
 const OrgUser = require("../../admin_application/models/orgUser");
+const Assessment = require("../../admin_application/models/Assessment");
+
+
 
 // Get warmup questions for an assessment
 exports.getWarmupQuestions = async (req, res) => {
   try {
     const { assessmentId } = req.query;
+    let assessmentType = null;
 
-    const assessment = await AssessmentTypes.findById(assessmentId).populate("questions");
+    // 🔹 OrgUser Flow: assessmentId → Assessment → type (AssessmentTypes)
+    if (assessmentId) {
+      const assessment = await Assessment.findById(assessmentId);
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
 
-    if (!assessment || assessment.status !== "active") {
-      return res.status(400).json({ error: "Invalid or inactive assessment" });
+      assessmentType = await AssessmentTypes.findById(assessment.type).populate("questions");
+      if (!assessmentType) {
+        return res.status(404).json({ error: "Assessment type not found" });
+      }
     }
-    console.log(assessment.questions)
 
-    const warmupQuestions = assessment.questions.filter(q => q.phase === 0);
-    res.status(200).json(warmupQuestions);
+    // 🔹 Default User Flow: Find default AssessmentTypes by title
+    if (!assessmentType) {
+      assessmentType = await AssessmentTypes.findOne({ title: /Mental Health V1/i, status: "active" }).populate("questions");
+      if (!assessmentType) {
+        return res.status(404).json({ error: "Default assessment type not found" });
+      }
+    }
+
+    // 🔹 Filter warmup questions (phase === 0)
+    const warmupQuestions = assessmentType.questions.filter(q => q.phase === 0);
+    return res.status(200).json(warmupQuestions);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("Get Warmup Error:", error.message);
+    return res.status(400).json({ error: error.message });
   }
 };
 
@@ -35,23 +55,36 @@ exports.submitWarmup = async (req, res) => {
       return res.status(400).json({ error: "User or OrgUser ID is required" });
     }
 
-    // Determine assessmentId to use
-    let finalAssessment;
+    let assessmentType = null;
+
+    // 🔹 Org user flow (admin-based assessment)
     if (assessmentId) {
-      finalAssessment = await AssessmentTypes.findById(assessmentId);
-    } else if (jwtUserId) {
-      finalAssessment = await AssessmentTypes.findOne({ title: "Mental Wellbeing V1" });
+      const assessment = await Assessment.findById(assessmentId);
+      if (!assessment) {
+        return res.status(404).json({ error: "Linked assessment not found" });
+      }
+
+      assessmentType = await AssessmentTypes.findById(assessment.type).populate("questions");
+
+      if (!assessmentType) {
+        return res.status(404).json({ error: "Assessment type not found in admin setup" });
+      }
     }
 
-    if (!finalAssessment) {
-      return res.status(404).json({ error: "Assessment not found" });
+    // 🔹 General user flow (default assessment type)
+    if (!assessmentType && jwtUserId) {
+      assessmentType = await AssessmentTypes.findOne({ title: /Mental Health V1/i, status: "active" }).populate("questions");
+      if (!assessmentType) {
+        return res.status(404).json({ error: "Default assessment type not found" });
+      }
     }
 
+    // Create the outcome with reference to the assessmentType
     const outcome = new AssessmentOutcome({
       userId: finalUserId,
       organizationId,
-      assessmentId: finalAssessment._id,
-      type: finalAssessment.title || "Mental Wellbeing V1",
+      assessmentType: assessmentType._id,
+      // type: assessmentType.title || "Mental Wellbeing V1",
       warmupResponses: warmupAnswers,
     });
 
@@ -63,11 +96,11 @@ exports.submitWarmup = async (req, res) => {
       });
     }
 
-    const fullAssessment = await AssessmentTypes.findById(finalAssessment._id).populate("questions");
-    const screeningQuestions = fullAssessment.questions.filter(q => q.phase === 1);
+    // Filter warmup questions (phase 0)
+    const screeningQuestions = assessmentType.questions.filter(q => q.phase === 1);
 
     return res.status(200).json({
-      screeningQuestions,
+      screeningQuestions: screeningQuestions,
       outcomeId: outcome._id,
     });
   } catch (error) {
@@ -87,29 +120,40 @@ exports.submitScreening = async (req, res) => {
     outcome.screeningResponses = screeningAnswers;
     await outcome.save();
 
-    const assessment = await AssessmentTypes.findById(outcome.assessmentId)
-      .populate("questions")
-      .populate("diseases");
+    let assessmentType;
 
-    const screeningQuestions = assessment.questions.filter(q => q.phase === 1);
+    if (outcome.assessmentType) {
+      // Default user (or new logic)
+      assessmentType = await AssessmentTypes.findById(outcome.assessmentType)
+        .populate("questions")
+        .populate("diseases");
+    } else if (outcome.assessmentId) {
+      // Org user via Assessment -> AssessmentTypes
+      // const Assessment = require("../models/Assessment");
+      const assessment = await Assessment.findById(outcome.assessmentId);
+      assessmentType = await AssessmentTypes.findById(assessment.type)
+        .populate("questions")
+        .populate("diseases");
+    }
+
+    if (!assessmentType) return res.status(404).json({ error: "Assessment type not found" });
+
+    const screeningQuestions = assessmentType.questions.filter(q => q.phase === 1);
     const flaggedDiseases = [];
 
-    for (const disease of assessment.diseases) {
+    for (const disease of assessmentType.diseases) {
       const diseaseQuestions = screeningQuestions.filter(q => q.disease?.toString() === disease._id.toString());
 
-      const validCount = screeningAnswers.filter((ans) =>
-        diseaseQuestions.some(
-          (q) => q._id.equals(ans.questionId) && q.validOptions.includes(ans.answer)
-        )
+      const validCount = screeningAnswers.filter(ans =>
+        diseaseQuestions.some(q => q._id.equals(ans.questionId) && q.validOptions.includes(ans.answer))
       ).length;
 
-      // Screening threshold is optional — fixed for now
       if (validCount >= 1) {
         flaggedDiseases.push(disease._id);
       }
     }
 
-    const severityQuestions = assessment.questions.filter(
+    const severityQuestions = assessmentType.questions.filter(
       q => q.phase === 2 && flaggedDiseases.some(dId => q.disease?.toString() === dId.toString())
     );
 
@@ -119,6 +163,7 @@ exports.submitScreening = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Submit severity and return results
 exports.submitSeverity = async (req, res) => {
@@ -130,25 +175,38 @@ exports.submitSeverity = async (req, res) => {
 
     outcome.severityResponses = severityAnswers;
 
-    const assessment = await AssessmentTypes.findById(outcome.assessmentId)
-      .populate("questions")
-      .populate("diseases");
+    let assessmentType;
+
+    if (outcome.assessmentType) {
+      assessmentType = await AssessmentTypes.findById(outcome.assessmentType)
+        .populate("questions")
+        .populate("diseases");
+    } else if (outcome.assessmentId) {
+      // const Assessment = require("../models/Assessment");
+      const assessment = await Assessment.findById(outcome.assessmentId);
+      assessmentType = await AssessmentTypes.findById(assessment.type)
+        .populate("questions")
+        .populate("diseases");
+    }
+
+    if (!assessmentType) return res.status(404).json({ error: "Assessment type not found" });
 
     const results = [];
 
-    for (const disease of assessment.diseases) {
-      const criteria = assessment.scoringCriteria.find(c => c.diseaseId.toString() === disease._id.toString()) || {};
+    for (const disease of assessmentType.diseases) {
+      const criteria = assessmentType.scoringCriteria.find(
+        c => c.diseaseId.toString() === disease._id.toString()
+      ) || {};
+
       const moderateThreshold = criteria.moderate || 2;
       const severeThreshold = criteria.severe || 4;
 
-      const relevantQuestions = assessment.questions.filter(
+      const relevantQuestions = assessmentType.questions.filter(
         q => q.disease?.toString() === disease._id.toString() && q.phase === 2
       );
 
-      const severityCount = severityAnswers.filter((ans) =>
-        relevantQuestions.some(
-          (q) => q._id.equals(ans.questionId) && q.validOptions.includes(ans.answer)
-        )
+      const severityCount = severityAnswers.filter(ans =>
+        relevantQuestions.some(q => q._id.equals(ans.questionId) && q.validOptions.includes(ans.answer))
       ).length;
 
       let severityLevel = "Mild";
@@ -165,28 +223,31 @@ exports.submitSeverity = async (req, res) => {
         reportText: {
           whatItMeans: reportText.whatItMeans || "",
           howItFeels: reportText.howItFeels || "",
-          whatCanHelp: reportText.whatCanHelp || "",
-        },
+          whatCanHelp: reportText.whatCanHelp || ""
+        }
       });
     }
 
     outcome.results = results;
     await outcome.save();
 
-    // Update count in assessment
-    await Assessment.findByIdAndUpdate(outcome.assessmentId, {
-      $inc: { completedCount: 1 },
-    });
+    // Optional: if using assessmentId for org reporting
+    if (outcome.assessmentId) {
+      const Assessment = require("../models/Assessment");
+      await Assessment.findByIdAndUpdate(outcome.assessmentId, { $inc: { completedCount: 1 } });
+    }
 
     res.status(200).json({
       message: "Assessment completed",
       outcomeId: outcome._id,
-      results,
+      results
     });
   } catch (error) {
+    console.error(error);
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Get outcome by ID
 exports.getOutcomeById = async (req, res) => {

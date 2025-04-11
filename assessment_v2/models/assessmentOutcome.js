@@ -1,10 +1,9 @@
-// models/AssessmentOutcome.js
 const mongoose = require("mongoose");
 
 const AssessmentOutcomeSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // or "OrgUser" if from organization
+    ref: "User",
     required: false,
   },
   organizationId: {
@@ -12,14 +11,11 @@ const AssessmentOutcomeSchema = new mongoose.Schema({
     ref: "Organisation",
     required: false,
   },
-  assessmentId: {
+  // 👇 Updated field to refer to AssessmentTypes model
+  assessmentType: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Assessment",
-    required: false,
-  },
-  type: {
-    type: String,
-    default: "Emotional Well Being V1",
+    ref: "AssessmentTypes",
+    required: true, // Make it required if every outcome must map to an assessment type
   },
   date: {
     type: Date,
