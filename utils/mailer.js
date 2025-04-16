@@ -30,7 +30,7 @@ async function Mailer(email, text, subject) {
       service: "gmail",
       auth: {
         type: "OAuth2",
-        user: "hello@jaagr.com",
+        user: "Jaagr Health",
         clientId: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
