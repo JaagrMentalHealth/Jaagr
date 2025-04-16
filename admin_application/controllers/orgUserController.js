@@ -86,6 +86,7 @@ exports.uploadOrgUsersCSV = async (req, res) => {
       }
   
       const users = [];
+      var response=false
   
       fs.createReadStream(req.file.path)
         .pipe(csv())
@@ -121,12 +122,15 @@ exports.uploadOrgUsersCSV = async (req, res) => {
                   `${URL}/diagnose?organizationId=${user.organizationId}&orgUserId=${user._id}&assessmentId=${assessmentId}`
                 );
             
-              await Mailer(user.email, personalizedText, emailSubject);
+              response=await Mailer(user.email, personalizedText, emailSubject);
             }
+            if(response)return res
+            .status(201)
+            .json({ message: "Users uploaded and emails sent", users: inserted });
   
-            return res
-              .status(201)
-              .json({ message: "Users uploaded and emails sent", users: inserted });
+            
+
+            return res.status(401).json({message:"Users uploaded but mail not send"})
           } catch (error) {
             console.error("Insertion or email error:", error.message);
             return res.status(500).json({ error: error.message });
@@ -154,6 +158,7 @@ exports.uploadOrgUsersCSV = async (req, res) => {
             assessmentId,
             userId: user._id,
           });
+          console.log(user._id)
   
           let status = "Pending";
           let riskFactor = "Unknown";

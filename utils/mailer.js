@@ -39,7 +39,7 @@ async function Mailer(email, text, subject) {
     });
 
     const mailOptions = {
-      from: "Jaagr Health",
+      from: '"Jaagr Health" <hello@jaagr.com>',
       to: email,
       subject: subject,
       text: text,

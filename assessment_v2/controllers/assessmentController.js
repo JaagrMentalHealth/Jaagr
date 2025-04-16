@@ -50,6 +50,8 @@ exports.submitWarmup = async (req, res) => {
     const { warmupAnswers, organizationId, assessmentId, orgUserId } = req.body;
     const jwtUserId = req.user ? req.user._id : null;
     const finalUserId = jwtUserId || orgUserId;
+    console.log(jwtUserId==finalUserId)
+    
 
     if (!finalUserId) {
       return res.status(400).json({ error: "User or OrgUser ID is required" });
@@ -83,8 +85,8 @@ exports.submitWarmup = async (req, res) => {
     const outcome = new AssessmentOutcome({
       userId: finalUserId,
       organizationId,
+      assessmentId,                       // ✅ Add this
       assessmentType: assessmentType._id,
-      // type: assessmentType.title || "Mental Wellbeing V1",
       warmupResponses: warmupAnswers,
     });
 
@@ -232,9 +234,9 @@ exports.submitSeverity = async (req, res) => {
     await outcome.save();
 
     // Optional: if using assessmentId for org reporting
-    if (outcome.assessmentId) {
-      const Assessment = require("../models/Assessment");
-      await Assessment.findByIdAndUpdate(outcome.assessmentId, { $inc: { completedCount: 1 } });
+    if (outcome.assessmentType) {
+      // const Assessment = require("../models/Assessment");
+      await AssessmentTypes.findByIdAndUpdate(outcome.assessmentType, { $inc: { completedCount: 1 } });
     }
 
     res.status(200).json({
