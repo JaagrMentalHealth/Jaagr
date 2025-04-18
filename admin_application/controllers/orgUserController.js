@@ -119,7 +119,7 @@ exports.uploadOrgUsersCSV = async (req, res) => {
                 .replace("[Name]", user.fullName)
                 .replace(
                   "[Assessment Link]",
-                  `${URL}/diagnose?organizationId=${user.organizationId}&orgUserId=${user._id}&assessmentId=${assessmentId}`
+                  `${URL}/test?organizationId=${user.organizationId}&orgUserId=${user._id}&assessmentId=${assessmentId}`
                 );
             
               response=await Mailer(user.email, personalizedText, emailSubject);

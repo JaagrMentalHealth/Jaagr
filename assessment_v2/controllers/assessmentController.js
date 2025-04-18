@@ -21,6 +21,11 @@ exports.getWarmupQuestions = async (req, res) => {
         return res.status(404).json({ error: "Assessment not found" });
       }
 
+      // 🔹 Check if the assessment has expired
+      if (assessment.validUntil && new Date(assessment.validUntil) < new Date()) {
+        return res.status(410).json({ error: "This assessment has expired." });
+      }
+
       assessmentType = await AssessmentTypes.findById(assessment.type).populate("questions");
       if (!assessmentType) {
         return res.status(404).json({ error: "Assessment type not found" });
@@ -29,7 +34,11 @@ exports.getWarmupQuestions = async (req, res) => {
 
     // 🔹 Default User Flow: Find default AssessmentTypes by title
     if (!assessmentType) {
-      assessmentType = await AssessmentTypes.findOne({ title: /Mental Health V1/i, status: "active" }).populate("questions");
+      assessmentType = await AssessmentTypes.findOne({
+        title: /Mental Health V1/i,
+        status: "active",
+      }).populate("questions");
+
       if (!assessmentType) {
         return res.status(404).json({ error: "Default assessment type not found" });
       }
