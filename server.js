@@ -13,6 +13,7 @@ const blogRoutes = require("./routes/blogRoutes");
 const errorHandler = require("./middleware/errorHandler");
 const adminApp = require("./admin_application/adminServer");
 const assessmentApp=require("./assessment_v2/assessment")
+const contactRouter=require("./routes/contactRoutes")
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/otp", otpRoutes);
 app.use("/api/assessment",assessmentRoutes)
+app.use("/api/contact",contactRouter)
 
 app.use("/admin",adminApp)
 app.use("/assessment",assessmentApp)
