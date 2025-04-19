@@ -3,7 +3,8 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { OAuth2Client } = require("google-auth-library");
 const { Mailer } = require("../utils/mailer");
-const AssessmentOutcome=require("../assessment_v2/models/assessmentOutcome")
+const AssessmentOutcome = require("../assessment_v2/models/assessmentOutcome");
+const AssessmentTypes=require("../assessment_v2/models/Assessment")
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -194,7 +195,17 @@ exports.getCurrentUser = async (req, res) => {
   try {
     const user = await User.findOne({ userName: req.user.userName })
       .populate("blogs likedBlogs savedBlogs history assessment")
-      .populate("history.author");
+      .populate("history.author")
+      .populate({
+        path: "assessment",
+        populate: {
+          path: "assessmentType",
+          model: "AssessmentTypes", // <-- ensure the model name is correct
+        },
+      })
+
+
+      // console.log(user)
 
     if (!user) {
       return res.status(404).json({
