@@ -35,7 +35,7 @@ exports.getWarmupQuestions = async (req, res) => {
     // 🔹 Default User Flow: Find default AssessmentTypes by title
     if (!assessmentType) {
       assessmentType = await AssessmentTypes.findOne({
-        title: /Mental Health V1/i,
+        title: /Emotional Wellbeing V1/i,
         status: "active",
       }).populate("questions");
 
@@ -84,7 +84,7 @@ exports.submitWarmup = async (req, res) => {
 
     // 🔹 General user flow (default assessment type)
     if (!assessmentType && jwtUserId) {
-      assessmentType = await AssessmentTypes.findOne({ title: /Mental Health V1/i, status: "active" }).populate("questions");
+      assessmentType = await AssessmentTypes.findOne({ title: /Emotional Wellbeing V1/i, status: "active" }).populate("questions");
       if (!assessmentType) {
         return res.status(404).json({ error: "Default assessment type not found" });
       }
