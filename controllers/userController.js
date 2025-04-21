@@ -190,6 +190,72 @@ exports.getFullName = async (req, res) => {
   }
 };
 
+exports.getAllUsersWithAssessment = async (req, res) => {
+  try {
+    const users = await User.find({})
+      .select("fullName email createdAt ghost")
+      .populate({
+        path: "assessment",
+        select: "results date", // pick what you want to expose
+        populate: {
+          path: "assessmentType",
+          select: "title", // optional
+        },
+      });
+
+    const formatted = users.map((user) => ({
+      _id: user._id,
+      name: user.fullName,
+      email: user.email,
+      registrationDate: user.createdAt,
+      testStatus: user.assessment?.length > 0 ? "Completed" : "Pending",
+      report: user.assessment?.length > 0 ? `${user.assessment.length} Test(s)` : "N/A",
+      type: user.ghost ? "Ghost" : "Real",
+    }));
+
+    res.status(200).json({ status: "success", users: formatted });
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    res.status(500).json({ status: "fail", message: "Internal Server Error" });
+  }
+};
+// GET /api/user/:id
+exports.getUserById = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const user = await User.findById(userId)
+      .populate({
+        path: "assessment",
+        populate: {
+          path: "assessmentType",
+          model: "AssessmentTypes",
+        },
+      });
+
+    if (!user) {
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        user,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+
+
 exports.getCurrentUser = async (req, res) => {
   console.log("Hi");
   try {
