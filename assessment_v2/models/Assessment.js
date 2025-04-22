@@ -10,6 +10,7 @@ const AssessmentSchema = new mongoose.Schema({
   status: { type: String, enum: ["active", "inactive"], default: "inactive" },
   completedCount: { type: Number, default: 0 },
   specificInstructions: { type: String },
+  estimatedTime: { type: Number, default: 5 }, // ✅ <-- Add this line
   scoringCriteria: [{
     diseaseId: { type: mongoose.Schema.Types.ObjectId, ref: "Disease" },
     moderate: Number,

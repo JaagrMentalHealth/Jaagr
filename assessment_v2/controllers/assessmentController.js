@@ -35,7 +35,7 @@ exports.getWarmupQuestions = async (req, res) => {
     // 🔹 Default User Flow: Find default AssessmentTypes by title
     if (!assessmentType) {
       assessmentType = await AssessmentTypes.findOne({
-        title: /Emotional Wellbeing V1/i,
+        title: /Dummy Test/i,
         status: "active",
       }).populate("questions");
 
