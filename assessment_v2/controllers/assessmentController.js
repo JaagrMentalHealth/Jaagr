@@ -26,7 +26,7 @@ exports.getWarmupQuestions = async (req, res) => {
         return res.status(410).json({ error: "This assessment has expired." });
       }
 
-      assessmentType = await AssessmentTypes.findById(assessment.type).populate("questions");
+      assessmentType = await AssessmentTypes.findById(assessment.type)
       if (!assessmentType) {
         return res.status(404).json({ error: "Assessment type not found" });
       }
@@ -37,7 +37,7 @@ exports.getWarmupQuestions = async (req, res) => {
       assessmentType = await AssessmentTypes.findOne({
         title: /Dummy Test/i,
         status: "active",
-      }).populate("questions");
+      })
 
       if (!assessmentType) {
         return res.status(404).json({ error: "Default assessment type not found" });
@@ -75,7 +75,7 @@ exports.submitWarmup = async (req, res) => {
         return res.status(404).json({ error: "Linked assessment not found" });
       }
 
-      assessmentType = await AssessmentTypes.findById(assessment.type).populate("questions");
+      assessmentType = await AssessmentTypes.findById(assessment.type)
 
       if (!assessmentType) {
         return res.status(404).json({ error: "Assessment type not found in admin setup" });
@@ -84,7 +84,7 @@ exports.submitWarmup = async (req, res) => {
 
     // 🔹 General user flow (default assessment type)
     if (!assessmentType && jwtUserId) {
-      assessmentType = await AssessmentTypes.findOne({ title: /Emotional Wellbeing V1/i, status: "active" }).populate("questions");
+      assessmentType = await AssessmentTypes.findOne({ title: /Emotional Wellbeing V1/i, status: "active" })
       if (!assessmentType) {
         return res.status(404).json({ error: "Default assessment type not found" });
       }
@@ -134,17 +134,10 @@ exports.submitScreening = async (req, res) => {
     let assessmentType;
 
     if (outcome.assessmentType) {
-      // Default user (or new logic)
-      assessmentType = await AssessmentTypes.findById(outcome.assessmentType)
-        .populate("questions")
-        .populate("diseases");
+      assessmentType = await AssessmentTypes.findById(outcome.assessmentType);
     } else if (outcome.assessmentId) {
-      // Org user via Assessment -> AssessmentTypes
-      // const Assessment = require("../models/Assessment");
       const assessment = await Assessment.findById(outcome.assessmentId);
-      assessmentType = await AssessmentTypes.findById(assessment.type)
-        .populate("questions")
-        .populate("diseases");
+      assessmentType = await AssessmentTypes.findById(assessment.type);
     }
 
     if (!assessmentType) return res.status(404).json({ error: "Assessment type not found" });
@@ -153,10 +146,16 @@ exports.submitScreening = async (req, res) => {
     const flaggedDiseases = [];
 
     for (const disease of assessmentType.diseases) {
-      const diseaseQuestions = screeningQuestions.filter(q => q.disease?.toString() === disease._id.toString());
+      const diseaseId = disease._id?.toString();
+
+      const diseaseQuestions = screeningQuestions.filter(
+        q => q.disease?.toString() === diseaseId
+      );
 
       const validCount = screeningAnswers.filter(ans =>
-        diseaseQuestions.some(q => q._id.equals(ans.questionId) && q.validOptions.includes(ans.answer))
+        diseaseQuestions.some(q =>
+          q._id?.toString() === ans.questionId && q.validOptions.includes(ans.answer)
+        )
       ).length;
 
       if (validCount >= 1) {
@@ -165,7 +164,8 @@ exports.submitScreening = async (req, res) => {
     }
 
     const severityQuestions = assessmentType.questions.filter(
-      q => q.phase === 2 && flaggedDiseases.some(dId => q.disease?.toString() === dId.toString())
+      q => q.phase === 2 &&
+        flaggedDiseases.some(dId => q.disease?.toString() === dId.toString())
     );
 
     res.status(200).json({ severityQuestions });
@@ -174,6 +174,7 @@ exports.submitScreening = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 
 // Submit severity and return results
@@ -189,35 +190,36 @@ exports.submitSeverity = async (req, res) => {
     let assessmentType;
 
     if (outcome.assessmentType) {
-      assessmentType = await AssessmentTypes.findById(outcome.assessmentType)
-        .populate("questions")
-        .populate("diseases");
+      // 🔁 Embedded diseases/questions, no need to populate
+      assessmentType = await AssessmentTypes.findById(outcome.assessmentType);
     } else if (outcome.assessmentId) {
-      // const Assessment = require("../models/Assessment");
       const assessment = await Assessment.findById(outcome.assessmentId);
-      assessmentType = await AssessmentTypes.findById(assessment.type)
-        .populate("questions")
-        .populate("diseases");
+      assessmentType = await AssessmentTypes.findById(assessment.type);
     }
 
-    if (!assessmentType) return res.status(404).json({ error: "Assessment type not found" });
+    if (!assessmentType) {
+      return res.status(404).json({ error: "Assessment type not found" });
+    }
 
     const results = [];
 
     for (const disease of assessmentType.diseases) {
+      const diseaseId = disease._id?.toString(); // embedded ID check
       const criteria = assessmentType.scoringCriteria.find(
-        c => c.diseaseId.toString() === disease._id.toString()
+        c => c.diseaseId?.toString() === diseaseId
       ) || {};
 
-      const moderateThreshold = criteria.moderate || 2;
-      const severeThreshold = criteria.severe || 4;
+      const moderateThreshold = criteria.moderate ?? 2;
+      const severeThreshold = criteria.severe ?? 4;
 
-      const relevantQuestions = assessmentType.questions.filter(
-        q => q.disease?.toString() === disease._id.toString() && q.phase === 2
+      const relevantQuestions = assessmentType.questions.filter(q =>
+        q.phase === 2 && q.disease?.toString() === diseaseId
       );
 
       const severityCount = severityAnswers.filter(ans =>
-        relevantQuestions.some(q => q._id.equals(ans.questionId) && q.validOptions.includes(ans.answer))
+        relevantQuestions.some(q =>
+          q._id?.toString() === ans.questionId && q.validOptions.includes(ans.answer)
+        )
       ).length;
 
       let severityLevel = "Mild";
@@ -242,10 +244,11 @@ exports.submitSeverity = async (req, res) => {
     outcome.results = results;
     await outcome.save();
 
-    // Optional: if using assessmentId for org reporting
     if (outcome.assessmentType) {
-      // const Assessment = require("../models/Assessment");
-      await AssessmentTypes.findByIdAndUpdate(outcome.assessmentType, { $inc: { completedCount: 1 } });
+      await AssessmentTypes.findByIdAndUpdate(
+        outcome.assessmentType,
+        { $inc: { completedCount: 1 } }
+      );
     }
 
     res.status(200).json({
@@ -258,6 +261,7 @@ exports.submitSeverity = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 
 // Get outcome by ID
