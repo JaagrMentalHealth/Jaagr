@@ -13,8 +13,8 @@ const QuestionSchema = new mongoose.Schema(
     validOptions: { type: [String], required: true },
     disease: { type: mongoose.Schema.Types.ObjectId, ref: "Disease" },
     phase: { type: Number, enum: [0, 1, 2], required: true },
-  },
-  { _id: false }
+  }
+  // { _id: false }
 );
 
 // Embedded Disease Schema
@@ -50,8 +50,8 @@ const DiseaseSchema = new mongoose.Schema(
         whatCanHelp: String,
       },
     },
-  },
-  { _id: false }
+  }
+  // { _id: false }
 );
 
 // Main AssessmentType Schema
