@@ -15,6 +15,7 @@ const AssessmentOutcomeSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Assessment", // newly re-added
   },
+  complete: { type: Boolean, default: false }, 
 
   date: { type: Date, default: Date.now },
   durationInMinutes: Number,

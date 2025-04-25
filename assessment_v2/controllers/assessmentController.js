@@ -35,7 +35,7 @@ exports.getWarmupQuestions = async (req, res) => {
     // 🔹 Default User Flow: Find default AssessmentTypes by title
     if (!assessmentType) {
       assessmentType = await AssessmentTypes.findOne({
-        title: /Dummy Test/i,
+        title: /Emotional Wellbeing V1/i,
         status: "active",
       })
 
@@ -85,6 +85,7 @@ exports.submitWarmup = async (req, res) => {
     // 🔹 General user flow (default assessment type)
     if (!assessmentType && jwtUserId) {
       assessmentType = await AssessmentTypes.findOne({ title: /Emotional Wellbeing V1/i, status: "active" })
+      console.log(assessmentType)
       if (!assessmentType) {
         return res.status(404).json({ error: "Default assessment type not found" });
       }
@@ -98,6 +99,7 @@ exports.submitWarmup = async (req, res) => {
       assessmentType: assessmentType._id,
       warmupResponses: warmupAnswers,
     });
+    
 
     await outcome.save();
 
@@ -129,7 +131,8 @@ exports.submitScreening = async (req, res) => {
     if (!outcome) return res.status(404).json({ error: "Outcome not found" });
 
     outcome.screeningResponses = screeningAnswers;
-    await outcome.save();
+    
+    
 
     let assessmentType;
 
@@ -167,6 +170,12 @@ exports.submitScreening = async (req, res) => {
       q => q.phase === 2 &&
         flaggedDiseases.some(dId => q.disease?.toString() === dId.toString())
     );
+
+    if (severityQuestions.length === 0) {
+      outcome.complete = true; // no further questions
+    }
+    await outcome.save();
+    
 
     res.status(200).json({ severityQuestions });
   } catch (error) {
@@ -242,6 +251,7 @@ exports.submitSeverity = async (req, res) => {
     }
 
     outcome.results = results;
+    outcome.complete = true;
     await outcome.save();
 
     if (outcome.assessmentType) {
