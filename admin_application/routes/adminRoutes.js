@@ -5,6 +5,7 @@ const {
   deleteAdmin,
   getMyProfile,
 } = require("../controllers/adminController");
+const dashboardController=require('../controllers/dashboardController')
 const protect = require("../middlewares/authMiddleware");
 const roleMiddleware = require("../middlewares/roleMiddleware");
 
@@ -27,5 +28,8 @@ router.delete(
   roleMiddleware(["master_admin", "super_admin"]),
   deleteAdmin
 );
+
+
+router.get("/dashboard-summary", dashboardController.getDashboardSummary);
 
 module.exports = router;
