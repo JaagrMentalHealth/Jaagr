@@ -9,5 +9,6 @@ router.post("/submit-warmup",authMiddleware.optionalAuth, assessmentController.s
 router.post("/submit-screening", assessmentController.submitScreening);
 router.post("/submit-severity", assessmentController.submitSeverity);
 router.get("/outcome/:outcomeId",assessmentController.getOutcomeById)
+router.delete("/outcome/:orgUserId",assessmentController.deleteOutcomeByOrgUser)
 
 module.exports = router;
