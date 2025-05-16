@@ -14,7 +14,6 @@ exports.getWarmupQuestions = async (req, res) => {
     const { assessmentId, orgUserId, organizationId } = req.query;
     let assessmentType = null;
 
-    // 🔒 Prevent retake: Check if the orgUser already has an outcome
     if (orgUserId && organizationId && assessmentId) {
       const alreadyTaken = await AssessmentOutcome.findOne({
         orgUserId,
@@ -30,42 +29,41 @@ exports.getWarmupQuestions = async (req, res) => {
       }
     }
 
-    // 🔹 OrgUser flow
     if (assessmentId) {
       const assessment = await Assessment.findById(assessmentId);
-      if (!assessment) {
-        return res.status(404).json({ error: "Assessment not found" });
-      }
-
-      if (assessment.validUntil && new Date(assessment.validUntil) < new Date()) {
+      if (!assessment || (assessment.validUntil && new Date(assessment.validUntil) < new Date())) {
         return res.status(410).json({ error: "This assessment has expired." });
       }
-
       assessmentType = await AssessmentTypes.findById(assessment.type);
-      if (!assessmentType) {
-        return res.status(404).json({ error: "Assessment type not found" });
-      }
     }
 
-    // 🔹 Default user flow
     if (!assessmentType) {
       assessmentType = await AssessmentTypes.findOne({
         title: /Emotional Wellbeing V1/i,
         status: "active",
       });
-
-      if (!assessmentType) {
-        return res.status(404).json({ error: "Default assessment type not found" });
-      }
     }
 
-    const warmupQuestions = assessmentType.questions.filter(q => q.phase === 0);
-    return res.status(200).json(warmupQuestions);
+    if (!assessmentType) {
+      return res.status(404).json({ error: "Assessment type not found" });
+    }
+
+    const questionsByPhase = [0, 1, 2].reduce((acc, phase) => {
+      acc[`phase${phase}`] = assessmentType.questions.filter(q => q.phase === phase);
+      return acc;
+    }, {});
+
+    return res.status(200).json({
+      ...questionsByPhase,
+      phasesAvailable: Object.entries(questionsByPhase)
+        .filter(([, questions]) => questions.length > 0)
+        .map(([key]) => parseInt(key.replace('phase', ''))),
+    });
   } catch (error) {
-    console.error("Get Warmup Error:", error.message);
     return res.status(400).json({ error: error.message });
   }
 };
+
 
 
 // Submit warmup and generate screening questions

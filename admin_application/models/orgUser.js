@@ -6,6 +6,7 @@ const OrgUserSchema = new mongoose.Schema({
   phone: String,
   assessmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Assessment"},
   organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organisation", required: true },
+  token: { type: String, unique: true },
   metadata: Object // optional: designation, batch, etc.
 }, { timestamps: true })
 
