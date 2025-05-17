@@ -5,6 +5,7 @@ const assessmentController = require("../controllers/assessmentController");
 const authMiddleware=require("../../middleware/auth")
 
 router.get("/warmup", assessmentController.getWarmupQuestions);
+router.get('/validity',assessmentController.checkValidity)
 router.post("/submit-warmup",authMiddleware.optionalAuth, assessmentController.submitWarmup);
 router.post("/submit-screening", assessmentController.submitScreening);
 router.post("/submit-severity", assessmentController.submitSeverity);

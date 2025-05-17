@@ -8,6 +8,7 @@ exports.createDisease = async (req, res) => {
     await disease.save();
     res.status(201).json(disease);
   } catch (error) {
+    console.log(error)
     res.status(400).json({ error: error.message });
   }
 };

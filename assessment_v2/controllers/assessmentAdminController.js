@@ -16,6 +16,7 @@ exports.createAssessment = async (req, res) => {
     await assessment.save();
     res.status(201).json(assessment);
   } catch (error) {
+    console.log(error)
     res.status(400).json({ error: error.message });
   }
 };

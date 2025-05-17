@@ -10,23 +10,28 @@ const Assessment = require("../../admin_application/models/Assessment");
 exports.getWarmupQuestions = async (req, res) => {
   try {
     const { assessmentId, orgUserId, organizationId } = req.query;
+    const jwtUserId = req.user ? req.user._id : null;
+    const finalUserId = jwtUserId || orgUserId;
+
     let assessmentType = null;
 
-    if (orgUserId && organizationId && assessmentId) {
-      const alreadyTaken = await AssessmentOutcome.findOne({
-        orgUserId,
-        organizationId,
-        assessmentId,
-      });
+    // ✅ Prevent retake if already completed
+    // if (assessmentId && finalUserId && organizationId) {
+    //   const alreadyTaken = await AssessmentOutcome.findOne({
+    //     assessmentId,
+    //     $or: [{ userId: finalUserId }, { orgUserId }],
+    //     organizationId,
+    //   });
 
-      if (alreadyTaken) {
-        return res.status(409).json({
-          error: "You have already attempted this assessment.",
-          outcomeId: alreadyTaken._id,
-        });
-      }
-    }
+    //   if (alreadyTaken) {
+    //     return res.status(409).json({
+    //       error: "You have already attempted this assessment.",
+    //       outcomeId: alreadyTaken._id,
+    //     });
+    //   }
+    // }
 
+    // ✅ Fetch the assessmentType
     if (assessmentId) {
       const assessment = await Assessment.findById(assessmentId);
       if (
@@ -49,21 +54,88 @@ exports.getWarmupQuestions = async (req, res) => {
       return res.status(404).json({ error: "Assessment type not found" });
     }
 
+    // ✅ Create the AssessmentOutcome even if warmup is empty
+    const outcome = new AssessmentOutcome({
+      userId: finalUserId || null,
+      orgUserId: orgUserId || null,
+      organizationId: organizationId || null,
+      assessmentType: assessmentType._id,
+      assessmentId: assessmentId || null,
+    });
+
+    await outcome.save();
+
+    // ✅ Get questions by phase
     const questionsByPhase = [0, 1, 2].reduce((acc, phase) => {
       acc[`phase${phase}`] = assessmentType.questions.filter(
         (q) => q.phase === phase
       );
       return acc;
     }, {});
+    // outcomeId: outcome._id,
+    // outcomeId: outcome._id,
 
-    return res.status(200).json({
+
+    return res.status(200).json({data:{
       ...questionsByPhase,
       phasesAvailable: Object.entries(questionsByPhase)
         .filter(([, questions]) => questions.length > 0)
         .map(([key]) => parseInt(key.replace("phase", ""))),
-    });
+    },outcomeId: outcome._id});
   } catch (error) {
+    console.error("Get Warmup Error:", error.message);
     return res.status(400).json({ error: error.message });
+  }
+};
+
+exports.checkValidity = async (req, res) => {
+  try {
+    const { assessmentId, orgUserId, organizationId } = req.query;
+    const jwtUserId = req.user ? req.user._id : null;
+    const finalUserId = jwtUserId || orgUserId;
+
+    if (!assessmentId) {
+      return res.status(400).json({ error: "Assessment ID is required" });
+    }
+
+    const assessment = await Assessment.findById(assessmentId);
+
+    if (!assessment) {
+      return res.status(404).json({ error: "Assessment not found" });
+    }
+
+    // Expiry Check
+    if (assessment.validUntil && new Date(assessment.validUntil) < new Date()) {
+      return res.status(410).json({
+        error: "Assessment has expired",
+        expiredOn: assessment.validUntil,
+      });
+    }
+
+    // Retake Check
+    if (finalUserId && organizationId) {
+      const alreadyTaken = await AssessmentOutcome.findOne({
+        assessmentId,
+        $or: [{ userId: finalUserId }, { orgUserId }],
+        organizationId,
+      });
+
+      if (alreadyTaken) {
+        return res.status(409).json({
+          error: "You have already attempted this assessment.",
+          outcomeId: alreadyTaken._id,
+        });
+      }
+    }
+
+    // Valid
+    return res.status(200).json({
+      message: "Assessment is valid",
+      validUntil: assessment.validUntil || null,
+    });
+  } catch (e) {
+    console.error("Check Validity Error:", e);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
