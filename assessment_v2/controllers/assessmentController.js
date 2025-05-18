@@ -313,7 +313,9 @@ exports.submitSeverity = async (req, res) => {
     const { severityAnswers, outcomeId } = req.body;
 
     const outcome = await AssessmentOutcome.findById(outcomeId);
-    if (!outcome) return res.status(404).json({ error: "Outcome not found" });
+    if (!outcome) {
+      return res.status(404).json({ error: "Outcome not found" });
+    }
 
     outcome.severityResponses = severityAnswers;
 
@@ -330,43 +332,35 @@ exports.submitSeverity = async (req, res) => {
       return res.status(404).json({ error: "Assessment type not found" });
     }
 
-    // Step 1: Identify diseases whose severity questions were rendered (i.e., answered)
+    // Step 1: Identify diseases that had severity questions answered
     const answeredDiseaseIds = assessmentType.questions
       .filter(
         (q) =>
           q.phase === 2 &&
           severityAnswers.some((ans) => ans.questionId === q._id.toString())
       )
-      .map((q) => q.disease?.toString());
+      .map((q) => q.disease?.toString())
+      .filter(Boolean); // Remove nulls in case of orphan questions
 
-    const allRelevantDiseases = assessmentType.diseases.filter(
-      (d) =>
-        d.allowedPhases?.includes(2) &&
-        answeredDiseaseIds.includes(d._id?.toString())
-    );
-
-    const uniqueDiseaseIds = [...new Set(allRelevantDiseases)];
+    const uniqueDiseaseIds = [...new Set(answeredDiseaseIds)];
 
     const results = [];
 
-    // Step 2: Evaluate only flagged diseases
-    for (const disease of assessmentType.diseases) {
-      const diseaseId = disease._id?.toString();
-      if (!uniqueDiseaseIds.includes(diseaseId)) continue; // ❌ Skip unrendered diseases
+    // Step 2: Evaluate severity for each relevant disease
+    for (const diseaseId of uniqueDiseaseIds) {
+      const diseaseData = assessmentType.diseases.find(
+        (d) => d._id?.toString() === diseaseId
+      );
 
-      const criteria =
-        assessmentType.scoringCriteria.find(
-          (c) => c.diseaseId?.toString() === diseaseId
-        ) || {};
+      if (!diseaseData) continue;
 
-      const moderateThreshold = criteria.moderate ?? 2;
-      const severeThreshold = criteria.severe ?? 4;
+      const { mild = 1, moderate = 2, severe = 3 } =
+        diseaseData.minimumSeverity || {};
 
       const relevantQuestions = assessmentType.questions.filter(
         (q) => q.phase === 2 && q.disease?.toString() === diseaseId
       );
 
-      // Step 3: Count how many severity answers match valid severity options
       const severityCount = severityAnswers.reduce((count, ans) => {
         const question = relevantQuestions.find(
           (q) => q._id?.toString() === ans.questionId
@@ -377,17 +371,21 @@ exports.submitSeverity = async (req, res) => {
         return count;
       }, 0);
 
-      // Step 4: Classify severity level
+      // ⚠️ Skip if below mild threshold
+      if (severityCount < mild) continue;
+
+      // Step 3: Determine severity level
       let severityLevel = "Mild";
-      if (severityCount >= severeThreshold) severityLevel = "Severe";
-      else if (severityCount >= moderateThreshold) severityLevel = "Moderate";
+      if (severityCount >= severe) severityLevel = "Severe";
+      else if (severityCount >= moderate) severityLevel = "Moderate";
 
       const reportText =
-        disease.reportText?.[severityLevel.toLowerCase()] || {};
-      const parameter = disease.assessmentParameter || disease.diseaseName;
+        diseaseData.reportText?.[severityLevel.toLowerCase()] || {};
+      const parameter =
+        diseaseData.assessmentParameter || diseaseData.diseaseName;
 
       results.push({
-        disease: disease.diseaseName,
+        disease: diseaseData.diseaseName,
         severity: severityLevel,
         assessmentParameter: parameter,
         reportText: {
@@ -398,12 +396,12 @@ exports.submitSeverity = async (req, res) => {
       });
     }
 
-    // Step 5: Finalize outcome
+    // Step 4: Finalize outcome
     outcome.results = results;
     outcome.complete = true;
     await outcome.save();
 
-    // Step 6: Increment usage stats
+    // Step 5: Increment usage count
     if (outcome.assessmentType) {
       await AssessmentTypes.findByIdAndUpdate(outcome.assessmentType, {
         $inc: { completedCount: 1 },
@@ -420,6 +418,9 @@ exports.submitSeverity = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+
+
 
 // Get outcome by ID
 exports.getOutcomeById = async (req, res) => {
