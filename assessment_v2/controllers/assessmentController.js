@@ -9,11 +9,12 @@ const Assessment = require("../../admin_application/models/Assessment");
 // Get warmup questions for an assessment
 exports.getWarmupQuestions = async (req, res) => {
   try {
-    const { assessmentId, orgUserId, organizationId } = req.query;
+    const { assessmentId, orgUserId, organizationId, assessmentName } =
+      req.query;
     const jwtUserId = req.user ? req.user._id : null;
     const finalUserId = jwtUserId || orgUserId;
-    console.log("Hi")
-    console.log(finalUserId,orgUserId,"UserID",jwtUserId)
+    console.log("Hi");
+    console.log(finalUserId, orgUserId, "UserID", jwtUserId);
 
     let assessmentType = null;
 
@@ -47,7 +48,7 @@ exports.getWarmupQuestions = async (req, res) => {
 
     if (!assessmentType) {
       assessmentType = await AssessmentTypes.findOne({
-        title: /Burnout Assessment/i,
+        title: new RegExp(assessmentName, "i"),
         status: "active",
       });
     }
@@ -77,13 +78,15 @@ exports.getWarmupQuestions = async (req, res) => {
     // outcomeId: outcome._id,
     // outcomeId: outcome._id,
 
-
-    return res.status(200).json({data:{
-      ...questionsByPhase,
-      phasesAvailable: Object.entries(questionsByPhase)
-        .filter(([, questions]) => questions.length > 0)
-        .map(([key]) => parseInt(key.replace("phase", ""))),
-    },outcomeId: outcome._id});
+    return res.status(200).json({
+      data: {
+        ...questionsByPhase,
+        phasesAvailable: Object.entries(questionsByPhase)
+          .filter(([, questions]) => questions.length > 0)
+          .map(([key]) => parseInt(key.replace("phase", ""))),
+      },
+      outcomeId: outcome._id,
+    });
   } catch (error) {
     console.error("Get Warmup Error:", error.message);
     return res.status(400).json({ error: error.message });
@@ -142,10 +145,10 @@ exports.checkValidity = async (req, res) => {
 };
 
 // Submit warmup and generate screening questions
+// Submit warmup and generate screening questions
 exports.submitWarmup = async (req, res) => {
   try {
-    const { warmupAnswers, organizationId, assessmentId, orgUserId, outcomeId } = req.body;
-    console.log(outcomeId)
+    const { warmupAnswers, outcomeId, orgUserId } = req.body;
     const jwtUserId = req.user ? req.user._id : null;
     const finalUserId = jwtUserId || orgUserId;
 
@@ -157,39 +160,25 @@ exports.submitWarmup = async (req, res) => {
       return res.status(400).json({ error: "Outcome ID is required" });
     }
 
+    // 🔍 Fetch outcome created during getWarmupQuestions
     const outcome = await AssessmentOutcome.findById(outcomeId);
     if (!outcome) {
       return res.status(404).json({ error: "Assessment outcome not found" });
     }
 
-    // Update warmup responses
+    // ✅ Update warmup responses
     outcome.warmupResponses = warmupAnswers;
     await outcome.save();
 
-    let assessmentType = null;
-
-    // Load assessmentType from linked assessmentId (if any)
-    if (assessmentId) {
-      const assessment = await Assessment.findById(assessmentId);
-      if (!assessment) {
-        return res.status(404).json({ error: "Linked assessment not found" });
-      }
-      assessmentType = await AssessmentTypes.findById(assessment.type);
+    // ✅ Get assessmentType from outcome directly
+    const assessmentType = await AssessmentTypes.findById(
+      outcome.assessmentType
+    );
+    if (!assessmentType) {
+      return res.status(404).json({ error: "Assessment type not found" });
     }
 
-    // Fallback for default user flow
-    if (!assessmentType && jwtUserId) {
-      assessmentType = await AssessmentTypes.findOne({
-        title: /Burnout Assessment/i,
-        status: "active",
-      });
-
-      if (!assessmentType) {
-        return res.status(404).json({ error: "Default assessment type not found" });
-      }
-    }
-
-    // Filter screening questions (phase 1)
+    // ✅ Return screening questions (phase 1)
     const screeningQuestions = assessmentType.questions.filter(
       (q) => q.phase === 1
     );
@@ -199,11 +188,10 @@ exports.submitWarmup = async (req, res) => {
       outcomeId: outcome._id,
     });
   } catch (error) {
-    console.error("Submit Warmup Error:", error.message);
+    console.log("Submit Warmup Error:", error);
     return res.status(400).json({ error: error.message });
   }
 };
-
 
 // Submit screening and get severity questions
 exports.submitScreening = async (req, res) => {
@@ -344,8 +332,11 @@ exports.submitSeverity = async (req, res) => {
 
       if (!diseaseData) continue;
 
-      const { mild = 1, moderate = 2, severe = 3 } =
-        diseaseData.minimumSeverity || {};
+      const {
+        mild = 1,
+        moderate = 2,
+        severe = 3,
+      } = diseaseData.minimumSeverity || {};
 
       const relevantQuestions = assessmentType.questions.filter(
         (q) => q.phase === 2 && q.disease?.toString() === diseaseId
@@ -415,9 +406,6 @@ exports.submitSeverity = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
-
-
 
 // Get outcome by ID
 exports.getOutcomeById = async (req, res) => {
