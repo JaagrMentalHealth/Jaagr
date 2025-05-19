@@ -360,8 +360,7 @@ exports.submitSeverity = async (req, res) => {
       if (severityCount >= severe) severityLevel = "Severe";
       else if (severityCount >= moderate) severityLevel = "Moderate";
 
-      const reportText =
-        diseaseData.reportText?.[severityLevel.toLowerCase()] || {};
+      const reportText = diseaseData.reportText?.mild || {};
       const parameter =
         diseaseData.assessmentParameter || diseaseData.diseaseName;
 
