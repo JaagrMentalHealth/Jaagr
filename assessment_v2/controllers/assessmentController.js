@@ -401,7 +401,14 @@ exports.submitSeverity = async (req, res) => {
     outcome.complete = true;
     await outcome.save();
 
-    // Step 5: Increment usage count
+    // Step 5: Add outcome to user's assessments if it's a JWT user
+    if (outcome.userId) {
+      await User.findByIdAndUpdate(outcome.userId, {
+        $push: { assessment: outcome._id },
+      });
+    }
+
+    // Step 6: Increment usage count
     if (outcome.assessmentType) {
       await AssessmentTypes.findByIdAndUpdate(outcome.assessmentType, {
         $inc: { completedCount: 1 },
