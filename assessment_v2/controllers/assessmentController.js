@@ -45,7 +45,7 @@ exports.getWarmupQuestions = async (req, res) => {
 
     if (!assessmentType) {
       assessmentType = await AssessmentTypes.findOne({
-        title: /Emotional Wellbeing V1/i,
+        title: /Burnout Assessment/i,
         status: "active",
       });
     }
@@ -172,7 +172,7 @@ exports.submitWarmup = async (req, res) => {
     // 🔹 General user flow (default assessment type)
     if (!assessmentType && jwtUserId) {
       assessmentType = await AssessmentTypes.findOne({
-        title: /Emotional Wellbeing V1/i,
+        title: /Burnout Assessment/i,
         status: "active",
       });
       console.log(assessmentType);
