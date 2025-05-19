@@ -12,6 +12,8 @@ exports.getWarmupQuestions = async (req, res) => {
     const { assessmentId, orgUserId, organizationId } = req.query;
     const jwtUserId = req.user ? req.user._id : null;
     const finalUserId = jwtUserId || orgUserId;
+    console.log("Hi")
+    console.log(finalUserId,orgUserId,"UserID",jwtUserId)
 
     let assessmentType = null;
 
@@ -175,7 +177,7 @@ exports.submitWarmup = async (req, res) => {
         title: /Burnout Assessment/i,
         status: "active",
       });
-      console.log(assessmentType);
+      // console.log(assessmentType);
       if (!assessmentType) {
         return res
           .status(404)
@@ -259,21 +261,21 @@ exports.submitScreening = async (req, res) => {
       const validCount = matchedAnswers.length;
 
       // 🔍 DEBUG LOGS
-      console.log(`\n🧬 Disease: ${disease.diseaseName}`);
-      console.log(
-        `➡️  Minimum Screening Required: ${disease.minimumScreening}`
-      );
-      console.log(`✅ Matched Valid Answers: ${validCount}`);
-      console.log(`📋 Matching Questions:`);
+      // console.log(`\n🧬 Disease: ${disease.diseaseName}`);
+      // console.log(
+      //   `➡️  Minimum Screening Required: ${disease.minimumScreening}`
+      // );
+      // console.log(`✅ Matched Valid Answers: ${validCount}`);
+      // console.log(`📋 Matching Questions:`);
 
       matchedAnswers.forEach((ans) => {
         const question = diseaseQuestions.find(
           (q) => q._id?.toString() === ans.questionId
         );
         if (question) {
-          console.log(
-            `  - Q: "${question.questionName}" | Answer: "${ans.answer}"`
-          );
+          // console.log(
+          //   `  - Q: "${question.questionName}" | Answer: "${ans.answer}"`
+          // );
         }
       });
 
@@ -450,7 +452,7 @@ exports.deleteOutcomeByOrgUser = async (req, res) => {
       return res.status(400).json({ error: "orgUserId is required" });
 
     const deleted = await AssessmentOutcome.deleteMany({ orgUserId });
-    console.log(deleted);
+    // console.log(deleted);
 
     if (!deleted) {
       return res
