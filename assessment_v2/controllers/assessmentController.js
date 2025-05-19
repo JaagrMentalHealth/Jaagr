@@ -144,71 +144,58 @@ exports.checkValidity = async (req, res) => {
 // Submit warmup and generate screening questions
 exports.submitWarmup = async (req, res) => {
   try {
-    const { warmupAnswers, organizationId, assessmentId, orgUserId } = req.body;
+    const { warmupAnswers, organizationId, assessmentId, orgUserId, outcomeId } = req.body;
+    console.log(outcomeId)
     const jwtUserId = req.user ? req.user._id : null;
     const finalUserId = jwtUserId || orgUserId;
-    console.log(jwtUserId == finalUserId);
 
     if (!finalUserId) {
       return res.status(400).json({ error: "User or OrgUser ID is required" });
     }
 
+    if (!outcomeId) {
+      return res.status(400).json({ error: "Outcome ID is required" });
+    }
+
+    const outcome = await AssessmentOutcome.findById(outcomeId);
+    if (!outcome) {
+      return res.status(404).json({ error: "Assessment outcome not found" });
+    }
+
+    // Update warmup responses
+    outcome.warmupResponses = warmupAnswers;
+    await outcome.save();
+
     let assessmentType = null;
 
-    // 🔹 Org user flow (admin-based assessment)
+    // Load assessmentType from linked assessmentId (if any)
     if (assessmentId) {
       const assessment = await Assessment.findById(assessmentId);
       if (!assessment) {
         return res.status(404).json({ error: "Linked assessment not found" });
       }
-
       assessmentType = await AssessmentTypes.findById(assessment.type);
-
-      if (!assessmentType) {
-        return res
-          .status(404)
-          .json({ error: "Assessment type not found in admin setup" });
-      }
     }
 
-    // 🔹 General user flow (default assessment type)
+    // Fallback for default user flow
     if (!assessmentType && jwtUserId) {
       assessmentType = await AssessmentTypes.findOne({
         title: /Burnout Assessment/i,
         status: "active",
       });
-      // console.log(assessmentType);
+
       if (!assessmentType) {
-        return res
-          .status(404)
-          .json({ error: "Default assessment type not found" });
+        return res.status(404).json({ error: "Default assessment type not found" });
       }
     }
 
-    // Create the outcome with reference to the assessmentType
-    const outcome = new AssessmentOutcome({
-      userId: finalUserId,
-      organizationId,
-      assessmentId, // ✅ Add this
-      assessmentType: assessmentType._id,
-      warmupResponses: warmupAnswers,
-    });
-
-    await outcome.save();
-
-    if (jwtUserId) {
-      await User.findByIdAndUpdate(jwtUserId, {
-        $push: { assessment: outcome._id },
-      });
-    }
-
-    // Filter warmup questions (phase 0)
+    // Filter screening questions (phase 1)
     const screeningQuestions = assessmentType.questions.filter(
       (q) => q.phase === 1
     );
 
     return res.status(200).json({
-      screeningQuestions: screeningQuestions,
+      screeningQuestions,
       outcomeId: outcome._id,
     });
   } catch (error) {
@@ -216,6 +203,7 @@ exports.submitWarmup = async (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 };
+
 
 // Submit screening and get severity questions
 exports.submitScreening = async (req, res) => {
