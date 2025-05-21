@@ -44,22 +44,25 @@ const blogSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-function generateSlug(author, heading) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hash = crypto.createHash('sha256')
-    .update(author + heading + salt)
-    .digest('hex');
-  return hash.substring(0, 12);
+function generateSlug(heading) {
+  return heading
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')           // Remove special characters
+    .replace(/\s+/g, '-')               // Replace spaces with dashes
+    .replace(/--+/g, '-')               // Remove multiple consecutive dashes
+    .substring(0, 100);                 // Optional: limit length
 }
+
 
 blogSchema.pre('save', async function(next) {
   if (this.isNew || this.isModified('heading')) {
-    let slug = generateSlug(this.author, this.heading);
-    let uniqueSlug = slug;
+    const baseSlug = generateSlug(this.heading);
+    let uniqueSlug = baseSlug;
     let counter = 1;
 
     while (await mongoose.model('Blog').findOne({ slug: uniqueSlug })) {
-      uniqueSlug = `${slug}-${counter}`;
+      uniqueSlug = `${baseSlug}-${counter}`;
       counter++;
     }
 
@@ -67,6 +70,7 @@ blogSchema.pre('save', async function(next) {
   }
   next();
 });
+
 
 blogSchema.index({ slug: 1 });
 blogSchema.index({ author: 1, createdAt: -1 });
