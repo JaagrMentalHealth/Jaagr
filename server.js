@@ -41,6 +41,10 @@ app.use("/api/blogs", blogRoutes);
 app.use("/api/otp", otpRoutes);
 app.use("/api/assessment",assessmentRoutes)
 app.use("/api/contact",contactRouter)
+// Health check route
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ success: true, message: "Server is healthy" });
+});
 
 app.use("/admin",adminApp)
 app.use("/assessment",assessmentApp)
