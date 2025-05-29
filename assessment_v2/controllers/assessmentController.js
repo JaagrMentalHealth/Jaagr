@@ -198,30 +198,48 @@ exports.submitScreening = async (req, res) => {
   try {
     const { screeningAnswers, outcomeId } = req.body;
 
+    // Validate input
+    if (!outcomeId || !Array.isArray(screeningAnswers)) {
+      return res.status(400).json({ error: "Invalid input data" });
+    }
+
+    // Fetch outcome document
     const outcome = await AssessmentOutcome.findById(outcomeId);
-    if (!outcome) return res.status(404).json({ error: "Outcome not found" });
+    if (!outcome) {
+      return res.status(404).json({ error: "Outcome not found" });
+    }
 
+    // Save screening responses
     outcome.screeningResponses = screeningAnswers;
+    await outcome.save();
 
-    let assessmentType;
+    // Fetch assessment type from outcome
+    let assessmentType = null;
 
     if (outcome.assessmentType) {
       assessmentType = await AssessmentTypes.findById(outcome.assessmentType);
     } else if (outcome.assessmentId) {
       const assessment = await Assessment.findById(outcome.assessmentId);
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
       assessmentType = await AssessmentTypes.findById(assessment.type);
     }
 
-    if (!assessmentType)
+    if (!assessmentType) {
       return res.status(404).json({ error: "Assessment type not found" });
+    }
 
+    // Filter all phase 1 (screening) questions
     const screeningQuestions = assessmentType.questions.filter(
       (q) => q.phase === 1
     );
+
     const flaggedDiseases = [];
 
     for (const disease of assessmentType.diseases) {
       const diseaseId = disease._id?.toString();
+
       const diseaseQuestions = screeningQuestions.filter(
         (q) => q.disease?.toString() === diseaseId
       );
@@ -236,54 +254,53 @@ exports.submitScreening = async (req, res) => {
 
       const validCount = matchedAnswers.length;
 
-      // 🔍 DEBUG LOGS
-      // console.log(`\n🧬 Disease: ${disease.diseaseName}`);
-      // console.log(
-      //   `➡️  Minimum Screening Required: ${disease.minimumScreening}`
-      // );
-      // console.log(`✅ Matched Valid Answers: ${validCount}`);
-      // console.log(`📋 Matching Questions:`);
-
-      matchedAnswers.forEach((ans) => {
-        const question = diseaseQuestions.find(
-          (q) => q._id?.toString() === ans.questionId
-        );
-        if (question) {
-          // console.log(
-          //   `  - Q: "${question.questionName}" | Answer: "${ans.answer}"`
-          // );
-        }
-      });
-
+      // Only flag if screening phase is enabled and minimum valid answers are met
       if (
-        disease.allowedPhases?.includes(1) ) {
-        if (validCount >= disease.minimumScreening) {
-           flaggedDiseases.push(disease._id);
-        }
-      }  
-      else if (!disease.allowedPhases?.includes(1)) {
-        // If screening is disabled, treat as flagged automatically
+        disease.allowedPhases?.includes(1) &&
+        validCount >= disease.minimumScreening
+      ) {
         flaggedDiseases.push(disease._id);
       }
 
+      // DO NOT auto-flag diseases with screening phase disabled
+      // To change this behavior, re-enable the block below:
+      //
+      // else if (!disease.allowedPhases?.includes(1)) {
+      //   flaggedDiseases.push(disease._id); // Optional fallback logic
+      // }
+    }
+
+    // Filter severity questions for only flagged diseases
     const severityQuestions = assessmentType.questions.filter(
       (q) =>
         q.phase === 2 &&
         flaggedDiseases.some((dId) => q.disease?.toString() === dId.toString())
     );
 
+    // If no severity questions, mark outcome as complete
     if (severityQuestions.length === 0) {
-      outcome.complete = true; // no further questions
+      outcome.complete = true;
+      await outcome.save();
+
+      return res.status(200).json({
+        message: "Assessment complete. No severity questions required.",
+        outcomeId: outcome._id,
+        severityQuestions: [],
+      });
     }
 
     await outcome.save();
 
-    res.status(200).json({ severityQuestions });
+    return res.status(200).json({
+      outcomeId: outcome._id,
+      severityQuestions,
+    });
   } catch (error) {
     console.error("Submit Screening Error:", error);
-    res.status(400).json({ error: error.message });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 // Submit severity and return results
 exports.submitSeverity = async (req, res) => {
