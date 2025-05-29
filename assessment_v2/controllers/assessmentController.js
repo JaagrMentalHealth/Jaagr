@@ -256,15 +256,15 @@ exports.submitScreening = async (req, res) => {
       });
 
       if (
-        disease.allowedPhases?.includes(1) &&
-        validCount >= disease.minimumScreening
-      ) {
-        flaggedDiseases.push(disease._id);
-      } else if (!disease.allowedPhases?.includes(1)) {
+        disease.allowedPhases?.includes(1) ) {
+        if (validCount >= disease.minimumScreening) {
+           flaggedDiseases.push(disease._id);
+        }
+      }  
+      else if (!disease.allowedPhases?.includes(1)) {
         // If screening is disabled, treat as flagged automatically
         flaggedDiseases.push(disease._id);
       }
-    }
 
     const severityQuestions = assessmentType.questions.filter(
       (q) =>
