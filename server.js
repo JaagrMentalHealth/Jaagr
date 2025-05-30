@@ -14,7 +14,7 @@ const errorHandler = require("./middleware/errorHandler");
 const adminApp = require("./admin_application/adminServer");
 const assessmentApp=require("./assessment_v2/assessment")
 const contactRouter=require("./routes/contactRoutes")
-const paymenrRouter=require("./routes/paymentRoutes")
+const paymentRouter=require("./routes/paymentRoutes")
 
 dotenv.config();
 

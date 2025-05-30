@@ -46,7 +46,7 @@ const createPayment = async (req, res) => {
     };
 
     const { data } = await axios.post(
-      "https://api-preprod.phonepe.com/apis/pg-sandbox/checkout/v2/pay",
+      "https://api.phonepe.com/apis/pg-sandbox/checkout/v2/pay",
       payload,
       {
         headers: {
