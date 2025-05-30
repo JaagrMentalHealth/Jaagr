@@ -14,6 +14,7 @@ const errorHandler = require("./middleware/errorHandler");
 const adminApp = require("./admin_application/adminServer");
 const assessmentApp=require("./assessment_v2/assessment")
 const contactRouter=require("./routes/contactRoutes")
+const paymenrRouter=require("./routes/paymentRoutes")
 
 dotenv.config();
 
@@ -46,6 +47,8 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({ success: true, message: "Server is healthy" });
 });
 
+app.get('/api/payment',paymentRouter)
+
 app.use("/admin",adminApp)
 app.use("/assessment",assessmentApp)
 
@@ -63,7 +66,7 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

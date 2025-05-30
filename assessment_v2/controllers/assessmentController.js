@@ -256,15 +256,14 @@ exports.submitScreening = async (req, res) => {
       });
 
       if (
-        disease.allowedPhases?.includes(1) &&
-        validCount >= disease.minimumScreening
-      ) {
-        flaggedDiseases.push(disease._id);
-      } else if (!disease.allowedPhases?.includes(1)) {
+        disease.allowedPhases?.includes(1) ) {
+  if (validCount >= disease.minimumScreening) {
+    flaggedDiseases.push(disease._id);
+  }}  else if (!disease.allowedPhases?.includes(1)) {
         // If screening is disabled, treat as flagged automatically
         flaggedDiseases.push(disease._id);
       }
-    }
+    
 
     const severityQuestions = assessmentType.questions.filter(
       (q) =>
@@ -279,7 +278,7 @@ exports.submitScreening = async (req, res) => {
     await outcome.save();
 
     res.status(200).json({ severityQuestions });
-  } catch (error) {
+  }} catch (error) {
     console.error("Submit Screening Error:", error);
     res.status(400).json({ error: error.message });
   }
