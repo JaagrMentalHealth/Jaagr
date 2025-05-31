@@ -198,22 +198,18 @@ exports.submitScreening = async (req, res) => {
   try {
     const { screeningAnswers, outcomeId } = req.body;
 
-    // Validate input
     if (!outcomeId || !Array.isArray(screeningAnswers)) {
       return res.status(400).json({ error: "Invalid input data" });
     }
 
-    // Fetch outcome document
     const outcome = await AssessmentOutcome.findById(outcomeId);
     if (!outcome) {
       return res.status(404).json({ error: "Outcome not found" });
     }
 
-    // Save screening responses
     outcome.screeningResponses = screeningAnswers;
     await outcome.save();
 
-    // Fetch assessment type from outcome
     let assessmentType = null;
 
     if (outcome.assessmentType) {
@@ -230,7 +226,6 @@ exports.submitScreening = async (req, res) => {
       return res.status(404).json({ error: "Assessment type not found" });
     }
 
-    // Filter all phase 1 (screening) questions
     const screeningQuestions = assessmentType.questions.filter(
       (q) => q.phase === 1
     );
@@ -253,31 +248,21 @@ exports.submitScreening = async (req, res) => {
       );
 
       const validCount = matchedAnswers.length;
+      const hasPhase1Questions = diseaseQuestions.length > 0;
 
-      // Only flag if screening phase is enabled and minimum valid answers are met
-      if (
-        disease.allowedPhases?.includes(1) &&
-        validCount >= disease.minimumScreening
-      ) {
+      if (!hasPhase1Questions) {
+        flaggedDiseases.push(disease._id);
+      } else if (validCount >= disease.minimumScreening) {
         flaggedDiseases.push(disease._id);
       }
-
-      // DO NOT auto-flag diseases with screening phase disabled
-      // To change this behavior, re-enable the block below:
-      //
-      // else if (!disease.allowedPhases?.includes(1)) {
-      //   flaggedDiseases.push(disease._id); // Optional fallback logic
-      // }
     }
 
-    // Filter severity questions for only flagged diseases
     const severityQuestions = assessmentType.questions.filter(
       (q) =>
         q.phase === 2 &&
         flaggedDiseases.some((dId) => q.disease?.toString() === dId.toString())
     );
 
-    // If no severity questions, mark outcome as complete
     if (severityQuestions.length === 0) {
       outcome.complete = true;
       await outcome.save();
@@ -300,6 +285,7 @@ exports.submitScreening = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 
 // Submit severity and return results
